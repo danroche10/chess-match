@@ -15,7 +15,7 @@ class Game:
     def _init(self):
         self.selected = None
         self.board = Board()
-        self.turn = RED
+        self.turn = BLUE
         self.valid_moves = {}
 
     def winner(self):
@@ -59,7 +59,7 @@ class Game:
 
     def change_turn(self):
         self.valid_moves = {}
-        if self.turn == RED:
+        if self.turn == BLUE:
             self.turn = WHITE
         else:
-            self.turn = RED
+            self.turn = BLUE
