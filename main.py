@@ -1,7 +1,9 @@
 # Assets: https://techwithtim.net/wp-content/uploads/2020/09/assets.zip
 import pygame
-from checkers.constants import WIDTH, HEIGHT, SQUARE_SIZE, RED
+from checkers.constants import WIDTH, HEIGHT, SQUARE_SIZE, RED, BLUE
 from checkers.game import Game
+from checkers.board import Board
+from checkers.pawn import Pawn
 
 FPS = 60
 
@@ -17,7 +19,9 @@ def get_row_col_from_mouse(pos):
 def main():
     run = True
     clock = pygame.time.Clock()
-    game = Game(WIN)
+    pawn = Pawn
+    board = Board(pawn)
+    game = Game(WIN, board)
 
     while run:
         clock.tick(FPS)

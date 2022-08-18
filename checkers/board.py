@@ -1,10 +1,10 @@
 import pygame
 from .constants import BLACK, ROWS, RED, BLUE, SQUARE_SIZE, COLS, WHITE
-from .piece import Piece
 
 class Board:
-    def __init__(self):
+    def __init__(self, pawn):
         self.board = []
+        self.pawn = pawn
         self.red_left = self.white_left = 12
         self.red_kings = self.white_kings = 0
         self.create_board()
@@ -27,9 +27,9 @@ class Board:
             self.board.append([])
             for col in range(COLS):
                 if row == 1:
-                    self.board[row].append(Piece(row, col, WHITE))
+                    self.board[row].append(self.pawn(row, col, WHITE, "PAWN"))
                 elif row == 6:
-                    self.board[row].append(Piece(row, col, BLUE))
+                    self.board[row].append(self.pawn(row, col, BLUE, "PAWN"))
                 else:
                     self.board[row].append(0)
   
@@ -63,25 +63,9 @@ class Board:
 
         row = piece.row
         col = piece.col
+        board = self.board
 
-        if piece.color == BLUE:
-            if self.board[row-1][col] == 0:
-                moves[(row-1, col)] = []
-            if row == 6 and self.board[row-2][col] == 0: 
-                moves[(row-2, col)] = []
-                # include color below
-            if self.board[row-1][col+1] != 0 and self.board[row-2][col+2] == 0 and self.board[row-1][col+1].color == WHITE:
-                moves[(row-2, col+2)] = [self.board[row-1][col+1]]
-            if self.board[row-1][col-1] != 0 and self.board[row-2][col-2] == 0 and self.board[row-1][col-1].color == WHITE:
-                moves[(row-2, col-2)] = [self.board[row-1][col-1]]
-        if piece.color == WHITE:
-            if self.board[row-1][col] == 0:
-                moves[(row+1, col)] = []
-            if row == 1 and self.board[row+2][col] == 0: 
-                moves[(row+2, col)] = []
-            if self.board[row+1][col+1] != 0 and self.board[row+2][col+2] == 0 and self.board[row+1][col+1].color == BLUE:
-                moves[(row+2, col+2)] = [self.board[row+1][col+1]]
-            if self.board[row+1][col-1] != 0 and self.board[row+2][col-2] == 0 and self.board[row+1][col-1].color == BLUE:
-                moves[(row+2, col-2)] = [self.board[row+1][col-1]]
-        
+        if piece.type == "PAWN":
+          moves = self.pawn.get_valid_pawn_moves(board, row, col, piece)
+
         return moves

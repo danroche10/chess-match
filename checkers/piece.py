@@ -5,10 +5,11 @@ class Piece:
     PADDING = 15
     OUTLINE = 2
 
-    def __init__(self, row, col, color):
+    def __init__(self, row, col, color, type):
         self.row = row
         self.col = col
         self.color = color
+        self.type = type
         self.king = False
         self.x = 0
         self.y = 0
@@ -27,6 +28,9 @@ class Piece:
         pygame.draw.circle(win, self.color, (self.x, self.y), radius)
         if self.king:
             win.blit(CROWN, (self.x - CROWN.get_width()//2, self.y - CROWN.get_height()//2))
+
+    def type(self):
+      return self.type
 
     def move(self, row, col):
         self.row = row
