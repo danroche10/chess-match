@@ -11,21 +11,21 @@ class Pawn(Piece):
       if piece.color == BLUE:
         if Pawn._one_square_ahead_is_empty(piece, board, row, col):
             moves = Helpers.get_updated_valid_moves(moves, row-1, col)
-        if Pawn._blues_first_move_and_two_squares_ahead_is_empty(board, row, col): 
+        if Pawn._first_move_and_two_squares_ahead_is_empty(piece, board, row, col): 
             moves = Helpers.get_updated_valid_moves(moves, row-2, col)
-        if Pawn._right_diagonal_take_is_valid(col) and Pawn._immediate_right_diagonal_contains_opponent_piece(piece, board, row, col) and board[row-2][col+2] == 0:
-            moves[(row-2, col+2)] = [board[row-1][col+1]]
-        if Pawn._left_diagonal_take_is_valid(col) and Pawn._immediate_left_diagonal_contains_opponent_piece(piece, board, row, col) and board[row-2][col-2] == 0:
-              moves[(row-2, col-2)] = [board[row-1][col-1]]
+        if Pawn._right_diagonal_take_is_valid(col) and Pawn._immediate_right_diagonal_contains_opponent_piece(piece, board, row, col) and Pawn._landing_square_for_right_diagonal_take_is_empty(piece, board, row, col):
+            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_right_diagonal_take(piece, board, moves, row, col)
+        if Pawn._left_diagonal_take_is_valid(col) and Pawn._immediate_left_diagonal_contains_opponent_piece(piece, board, row, col) and Pawn._landing_square_for_left_diagonal_take_is_empty(piece, board, row, col):
+            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_left_diagonal_take(piece, board, moves, row, col)
       if piece.color == WHITE:
         if Pawn._one_square_ahead_is_empty(piece, board, row, col):
             moves = Helpers.get_updated_valid_moves(moves, row+1, col)
-        if row == 1 and board[row+2][col] == 0: 
+        if Pawn._first_move_and_two_squares_ahead_is_empty(piece, board, row, col): 
             moves = Helpers.get_updated_valid_moves(moves, row+2, col)
-        if Pawn._right_diagonal_take_is_valid(col) and Pawn._immediate_right_diagonal_contains_opponent_piece(piece, board, row, col) and board[row+2][col+2] == 0:
-            moves[(row+2, col+2)] = [board[row+1][col+1]]
-        if Pawn._left_diagonal_take_is_valid(col) and Pawn._immediate_left_diagonal_contains_opponent_piece(piece, board, row, col) and board[row+2][col-2] == 0:
-            moves[(row+2, col-2)] = [board[row+1][col-1]]
+        if Pawn._right_diagonal_take_is_valid(col) and Pawn._immediate_right_diagonal_contains_opponent_piece(piece, board, row, col) and Pawn._landing_square_for_right_diagonal_take_is_empty(piece, board, row, col):
+            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_right_diagonal_take(piece, board, moves, row, col)
+        if Pawn._left_diagonal_take_is_valid(col) and Pawn._immediate_left_diagonal_contains_opponent_piece(piece, board, row, col) and Pawn._landing_square_for_left_diagonal_take_is_empty(piece, board, row, col):
+            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_left_diagonal_take(piece, board, moves, row, col)
           
       return moves
 
@@ -38,10 +38,14 @@ class Pawn(Piece):
           return True
       return False
 
-    def _blues_first_move_and_two_squares_ahead_is_empty(board, row, col):
-      if row == 6 and board[row-2][col] == 0:
-        return True
-      return False
+    def _first_move_and_two_squares_ahead_is_empty(piece, board, row, col):
+      if piece.color == BLUE:
+        if row == 6 and board[row-2][col] == 0:
+          return True
+      else:
+        if row == 1 and board[row+2][col] == 0:
+          return True
+        return False
 
     def _immediate_right_diagonal_contains_opponent_piece(piece, board, row, col):
       if piece.color == BLUE:
@@ -70,6 +74,40 @@ class Pawn(Piece):
       if col != 0 and col != 1:
         return True
       return False
+
+    def _get_updated_valid_moves_including_skipped_piece_for_right_diagonal_take(piece, board, moves, row, col):
+      if piece.color == BLUE:
+        moves[(row-2, col+2)] = [board[row-1][col+1]]
+      else:
+        moves[(row+2, col+2)] = [board[row+1][col+1]]
+      return moves
+
+    def _get_updated_valid_moves_including_skipped_piece_for_left_diagonal_take(piece, board, moves, row, col):
+      if piece.color == BLUE:
+        moves[(row-2, col-2)] = [board[row-1][col-1]]
+      else:
+        moves[(row+2, col-2)] = [board[row+1][col-1]]
+      return moves
+      
+    def _landing_square_for_right_diagonal_take_is_empty(piece, board, row, col):
+      if piece.color == BLUE:
+        if board[row-2][col+2] == 0:
+          return True
+      else:
+        if board[row+2][col+2] == 0:
+          return True
+      return False
+
+    def _landing_square_for_left_diagonal_take_is_empty(piece, board, row, col):
+      if piece.color == BLUE:
+        if board[row-2][col-2] == 0:
+          return True
+      else:
+        if board[row+2][col-2] == 0:
+          return True
+      return False
+
+
 
 
 

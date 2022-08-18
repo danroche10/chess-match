@@ -8,7 +8,7 @@ from checkers.pawn import Pawn
 FPS = 60
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('Checkers')
+pygame.display.set_caption('Chess')
 
 def get_row_col_from_mouse(pos):
     x, y = pos
@@ -25,10 +25,6 @@ def main():
 
     while run:
         clock.tick(FPS)
-
-        if game.winner() != None:
-            print(game.winner())
-            run = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
