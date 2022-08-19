@@ -18,14 +18,11 @@ def get_row_col_from_mouse(pos):
 
 def main():
     run = True
-    clock = pygame.time.Clock()
     pawn = Pawn
     board = Board(pawn)
     game = Game(WIN, board)
 
     while run:
-        clock.tick(FPS)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
