@@ -31,7 +31,7 @@ class Board:
         row = piece.row
         col = piece.col
         board = self.board
-
+        
         if piece.type == "PAWN":
           moves = self.__get_valid_pawn_moves(board, row, col, piece)
 

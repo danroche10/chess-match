@@ -1,5 +1,5 @@
-from checkers.helpers import Helpers
-from checkers.piece import Piece
+from chess.helpers import Helpers
+from chess.piece import Piece
 from .constants import BLUE, WHITE
 
 class Pawn(Piece):

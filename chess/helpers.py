@@ -1,4 +1,4 @@
-from checkers.constants import BLUE
+from chess.constants import BLUE
 
 class Helpers:
   def get_updated_valid_moves(moves, row, col):

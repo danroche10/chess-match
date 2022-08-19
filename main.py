@@ -1,9 +1,8 @@
-# Assets: https://techwithtim.net/wp-content/uploads/2020/09/assets.zip
 import pygame
-from checkers.constants import WIDTH, HEIGHT, SQUARE_SIZE, RED, BLUE
-from checkers.game import Game
-from checkers.board import Board
-from checkers.pawn import Pawn
+from chess.constants import WIDTH, HEIGHT, SQUARE_SIZE
+from chess.game import Game
+from chess.board import Board
+from chess.pawn import Pawn
 
 FPS = 60
 
