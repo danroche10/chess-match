@@ -12,7 +12,7 @@ class Board:
     def move(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move(row, col)
-
+    
     def get_piece(self, row, col): 
         return self.board[row][col]
 
@@ -63,7 +63,6 @@ class Board:
               pygame.draw.rect(win, RED, (row*SQUARE_SIZE, col *SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
     # Below methods reach into pawn.py
-
     def __get_valid_pawn_moves(self, board, row, col, piece):
       return self.pawn.get_valid_pawn_moves(board, row, col, piece)
 
