@@ -12,7 +12,8 @@ class Piece:
         self.type = type
         self.x = 0
         self.y = 0
-        self._calc_pos()        
+        self._calc_pos()
+                 
     def draw(self, win):
         radius = SQUARE_SIZE//2 - self.PADDING
         pygame.draw.circle(win, GREY, (self.x, self.y), radius + self.OUTLINE)

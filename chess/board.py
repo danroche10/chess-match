@@ -64,5 +64,6 @@ class Board:
 
     # Below methods reach into pawn.py
     def __get_valid_pawn_moves(self, board, row, col, piece):
-      return self.pawn.get_valid_pawn_moves(board, row, col, piece)
+      color = piece.color
+      return self.pawn.get_valid_pawn_moves(self, board, row, col, color)
 
