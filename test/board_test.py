@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 import pytest
 from chess.board import Board
 
@@ -6,6 +6,7 @@ from chess.board import Board
 def new_board():
     pawn = Mock()
     board = Board(pawn)
+    pawn.get_valid_pawn_moves = MagicMock(return_value={(4,3): []})
     return board
 
 def test_get_piece(new_board):
@@ -34,9 +35,9 @@ def test_remove(new_board):
 def test_get_valid_moves(new_board):
     board = new_board
     blue_piece = board.get_piece(6,3)
-    blue_piece.row, blue_piece.col = 6, 3
     blue_piece.type = "PAWN"
-    board.__get_valid_pawn_moves.assert_called_with(board, 6, 3, blue_piece)
+    valid_moves = board.get_valid_moves(blue_piece)
+    assert valid_moves == {(4,3): []}
   
 
 
