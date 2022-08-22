@@ -11,12 +11,7 @@ class Game:
         self.__draw_valid_moves(self.valid_moves)
         pygame.display.update()
 
-    def __init(self, board):
-        self.selected = None
-        self.board = board
-        self.turn = BLUE
-        self.valid_moves = {}
-
+    # split up method
     def select(self, row, col):
         if self.selected:
             result = self.__move(row, col)
@@ -30,6 +25,12 @@ class Game:
             return True
             
         return False
+
+    def __init(self, board):
+        self.selected = None
+        self.board = board
+        self.turn = BLUE
+        self.valid_moves = {}
 
     def __move(self, row, col):
         piece = self.__get_piece(row, col)
