@@ -1,5 +1,5 @@
 import pygame
-from .constants import BLACK, ROWS, RED, BLUE, SQUARE_SIZE, COLS, WHITE
+from .constants import LIGHT_GREY, ROWS, RED, BLUE, SQUARE_SIZE, COLS, WHITE
 
 class Board:
     def __init__(self, pawn):
@@ -43,7 +43,7 @@ class Board:
           for col in range(COLS):
               piece = self.board[row][col]
               if piece != 0:
-                  piece.draw(win)
+                 win.blit(pygame.image.load('chess/assets/black_pawn.png'), (col*100, row*100))
 
     def __create_board(self):
       for row in range(ROWS):
@@ -57,7 +57,7 @@ class Board:
                   self.board[row].append(0)
 
     def __draw_squares(self, win):
-      win.fill(BLACK)
+      win.fill(LIGHT_GREY)
       for row in range(ROWS):
           for col in range(row % 2, COLS, 2):
               pygame.draw.rect(win, RED, (row*SQUARE_SIZE, col *SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
