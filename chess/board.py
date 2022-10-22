@@ -43,17 +43,26 @@ class Board:
           for col in range(COLS):
               piece = self.board[row][col]                             
               if piece != 0:
-                  if piece.get_type() == "PAWN":
-                      piece.create(win, row, col)
+                  piece.create(win, row, col)
 
     def __create_board(self):
       for row in range(ROWS):
           self.board.append([])
           for col in range(COLS):
-              if row == 1:
+              if row == 0:
+                  if col == 0 or col == 7:
+                      self.board[row].append(self.piece_factory.new_rook(row, col, WHITE))
+                  else:
+                      self.board[row].append(0)
+              elif row == 1:
                   self.board[row].append(self.piece_factory.new_pawn(row, col, WHITE))
               elif row == 6:
                   self.board[row].append(self.piece_factory.new_pawn(row, col, BLACK))
+              elif row == 7:
+                  if col == 0 or col == 7:
+                      self.board[row].append(self.piece_factory.new_rook(row, col, BLACK))
+                  else:
+                      self.board[row].append(0)
               else:
                   self.board[row].append(0)
 
