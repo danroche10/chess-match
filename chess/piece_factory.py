@@ -19,7 +19,7 @@ class PieceFactory:
     return Bishop(row, col, color, "BISHOP")
   
   def new_queen(row, col, color):
-    return Queen(row, col, color, "Queen")
+    return Queen(row, col, color, "QUEEN")
   
   def new_king(row, col, color):
-    return King(row, col, color, "King")
+    return King(row, col, color, "KING")
