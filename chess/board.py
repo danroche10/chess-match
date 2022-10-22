@@ -1,10 +1,10 @@
 import pygame
-from .constants import LIGHT_GREY, ROWS, RED, BLUE, SQUARE_SIZE, COLS, WHITE
+from .constants import BLACK, LIGHT_GREY, ROWS, RED, SQUARE_SIZE, COLS, WHITE
 
 class Board:
-    def __init__(self, pawn):
+    def __init__(self, piece_factory):
         self.board = []
-        self.pawn = pawn
+        self.piece_factory = piece_factory
         self.red_left = self.white_left = 12
         self.red_kings = self.white_kings = 0
         self.__create_board()
@@ -20,7 +20,7 @@ class Board:
         for piece in pieces:
             self.board[piece.row][piece.col] = 0
             if piece != 0:
-                if piece.color == BLUE:
+                if piece.get_color() == BLACK:
                     self.red_left -= 1
                 else:
                     self.white_left -= 1
@@ -41,18 +41,19 @@ class Board:
       self.__draw_squares(win)
       for row in range(ROWS):
           for col in range(COLS):
-              piece = self.board[row][col]
+              piece = self.board[row][col]                             
               if piece != 0:
-                 win.blit(pygame.image.load('chess/assets/black_pawn.png'), (col*100, row*100))
+                  if piece.get_type() == "PAWN":
+                      piece.create(win, row, col)
 
     def __create_board(self):
       for row in range(ROWS):
           self.board.append([])
           for col in range(COLS):
               if row == 1:
-                  self.board[row].append(self.pawn(row, col, WHITE, "PAWN"))
+                  self.board[row].append(self.piece_factory.new_pawn(row, col, WHITE))
               elif row == 6:
-                  self.board[row].append(self.pawn(row, col, BLUE, "PAWN"))
+                  self.board[row].append(self.piece_factory.new_pawn(row, col, BLACK))
               else:
                   self.board[row].append(0)
 
@@ -65,5 +66,5 @@ class Board:
     # Below methods reach into pawn.py
     def __get_valid_pawn_moves(self, board, row, col, piece):
       color = piece.color
-      return self.pawn.get_valid_pawn_moves(self, board, row, col, color)
+      return self.board[row][col].get_valid_pawn_moves(board, row, col, color)
 

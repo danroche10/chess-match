@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, Mock
 import pytest
 from chess.pawn import Pawn
-from chess.constants import ROWS, COLS, WHITE, BLUE
+from chess.constants import ROWS, COLS, WHITE, BLACK
 
 @pytest.fixture
 def new_board():
@@ -12,7 +12,7 @@ def new_board():
             if row == 1:
                 board[row].append(Pawn(row, col, WHITE, "PAWN"))
             elif row == 6:
-                board[row].append(Pawn(row, col, BLUE, "PAWN"))
+                board[row].append(Pawn(row, col, BLACK, "PAWN"))
             else:
                 board[row].append(0)
     return board
@@ -29,7 +29,7 @@ def test_get_valid_pawn_moves_2(new_board):
     # change board setup
     new_board[6][3] = 0
     new_board[1][4] = 0
-    pawn_to_take = new_board[4][3] = Pawn(4, 3, BLUE, "PAWN")
+    pawn_to_take = new_board[4][3] = Pawn(4, 3, BLACK, "PAWN")
     pawn_to_get_taken = new_board[3][4] = Pawn(3, 4, WHITE, "PAWN")
     row = pawn_to_take.row
     col = pawn_to_take.col

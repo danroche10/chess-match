@@ -1,10 +1,10 @@
 import pytest
-from chess.constants import BLUE
+from chess.constants import BLACK
 from chess.piece import Piece
 
 @pytest.fixture
 def new_piece():
-  piece = Piece(6, 3, BLUE, "PAWN")
+  piece = Piece(6, 3, BLACK, "PAWN")
   return piece
 
 def test_type(new_piece):

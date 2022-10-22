@@ -24,19 +24,19 @@ def test_move(new_board):
 
 def test_remove(new_board):
     board = new_board
-    blue_piece = board.get_piece(6,3)
-    blue_piece.row, blue_piece.col = 6, 3
-    board.move(blue_piece, 4, 3)
-    blue_piece.row, blue_piece.col = 4, 3
-    board.remove([blue_piece])
-    piece_in_blues_previous_position = board.get_piece(4, 3)
-    assert piece_in_blues_previous_position == 0
+    black_piece = board.get_piece(6,3)
+    black_piece.row, black_piece.col = 6, 3
+    board.move(black_piece, 4, 3)
+    black_piece.row, black_piece.col = 4, 3
+    board.remove([black_piece])
+    piece_in_blacks_previous_position = board.get_piece(4, 3)
+    assert piece_in_blacks_previous_position == 0
 
 def test_get_valid_moves(new_board):
     board = new_board
-    blue_piece = board.get_piece(6,3)
-    blue_piece.type = "PAWN"
-    valid_moves = board.get_valid_moves(blue_piece)
+    black_piece = board.get_piece(6,3)
+    black_piece.type = "PAWN"
+    valid_moves = board.get_valid_moves(black_piece)
     assert valid_moves == {(4,3): []}
   
 
