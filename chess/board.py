@@ -52,6 +52,14 @@ class Board:
               if row == 0:
                   if col == 0 or col == 7:
                       self.board[row].append(self.piece_factory.new_rook(row, col, WHITE))
+                  elif col == 1 or col == 6:
+                      self.board[row].append(self.piece_factory.new_knight(row, col, WHITE))
+                  elif col == 2 or col == 5:
+                      self.board[row].append(self.piece_factory.new_bishop(row, col, WHITE))
+                  elif col == 3:
+                      self.board[row].append(self.piece_factory.new_queen(row, col, WHITE))
+                  elif col == 4:
+                      self.board[row].append(self.piece_factory.new_king(row, col, WHITE))
                   else:
                       self.board[row].append(0)
               elif row == 1:
@@ -61,6 +69,14 @@ class Board:
               elif row == 7:
                   if col == 0 or col == 7:
                       self.board[row].append(self.piece_factory.new_rook(row, col, BLACK))
+                  elif col == 1 or col == 6:
+                      self.board[row].append(self.piece_factory.new_knight(row, col, BLACK))
+                  elif col == 2 or col == 5:
+                      self.board[row].append(self.piece_factory.new_bishop(row, col, BLACK))
+                  elif col == 3:
+                      self.board[row].append(self.piece_factory.new_queen(row, col, BLACK))
+                  elif col == 4:
+                      self.board[row].append(self.piece_factory.new_king(row, col, BLACK))
                   else:
                       self.board[row].append(0)
               else:
