@@ -1,7 +1,6 @@
-from tkinter import colorchooser
 from chess.helpers import Helpers
 from chess.piece import Piece
-from .constants import BLUE, WHITE
+from .constants import BLACK, WHITE
 
 class Pawn(Piece):
     def getName():
@@ -9,24 +8,24 @@ class Pawn(Piece):
 
     def get_valid_pawn_moves(self, board, row, col, color):
       moves = {}
-      if color == BLUE:
+      if color == BLACK:
         if Pawn._one_square_ahead_is_empty(color, board, row, col):
-            moves = Helpers.get_updated_valid_moves(moves, row-1, col)
+            moves = Helpers.update_valid_moves(moves, row-1, col)
         if Pawn._first_move_and_two_squares_ahead_is_empty(color, board, row, col): 
-            moves = Helpers.get_updated_valid_moves(moves, row-2, col)
+            moves = Helpers.update_valid_moves(moves, row-2, col)
         if Pawn._right_diagonal_take_is_valid(col) and Pawn._immediate_right_diagonal_contains_opponent_piece(color, board, row, col) and Pawn._landing_square_for_right_diagonal_take_is_empty(color, board, row, col):
-            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_right_diagonal_take(color, board, moves, row, col)
+            moves = Pawn._update_valid_moves_including_skipped_piece_for_right_diagonal_take(color, board, moves, row, col)
         if Pawn._left_diagonal_take_is_valid(col) and Pawn._immediate_left_diagonal_contains_opponent_piece(color, board, row, col) and Pawn._landing_square_for_left_diagonal_take_is_empty(color, board, row, col):
-            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_left_diagonal_take(color, board, moves, row, col)
+            moves = Pawn._update_valid_moves_including_skipped_piece_for_left_diagonal_take(color, board, moves, row, col)
       if color == WHITE:
         if Pawn._one_square_ahead_is_empty(color, board, row, col):
-            moves = Helpers.get_updated_valid_moves(moves, row+1, col)
+            moves = Helpers.update_valid_moves(moves, row+1, col)
         if Pawn._first_move_and_two_squares_ahead_is_empty(color, board, row, col): 
-            moves = Helpers.get_updated_valid_moves(moves, row+2, col)
+            moves = Helpers.update_valid_moves(moves, row+2, col)
         if Pawn._right_diagonal_take_is_valid(col) and Pawn._immediate_right_diagonal_contains_opponent_piece(color, board, row, col) and Pawn._landing_square_for_right_diagonal_take_is_empty(color, board, row, col):
-            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_right_diagonal_take(color, board, moves, row, col)
+            moves = Pawn._update_valid_moves_including_skipped_piece_for_right_diagonal_take(color, board, moves, row, col)
         if Pawn._left_diagonal_take_is_valid(col) and Pawn._immediate_left_diagonal_contains_opponent_piece(color, board, row, col) and Pawn._landing_square_for_left_diagonal_take_is_empty(color, board, row, col):
-            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_left_diagonal_take(color, board, moves, row, col)
+            moves = Pawn._update_valid_moves_including_skipped_piece_for_left_diagonal_take(color, board, moves, row, col)
           
       return moves
 
@@ -76,14 +75,14 @@ class Pawn(Piece):
         return True
       return False
 
-    def _get_updated_valid_moves_including_skipped_piece_for_right_diagonal_take(color, board, moves, row, col):
+    def _update_valid_moves_including_skipped_piece_for_right_diagonal_take(color, board, moves, row, col):
       if color == BLUE:
         moves[(row-2, col+2)] = [board[row-1][col+1]]
       else:
         moves[(row+2, col+2)] = [board[row+1][col+1]]
       return moves
 
-    def _get_updated_valid_moves_including_skipped_piece_for_left_diagonal_take(color, board, moves, row, col):
+    def _update_valid_moves_including_skipped_piece_for_left_diagonal_take(color, board, moves, row, col):
       if color == BLUE:
         moves[(row-2, col-2)] = [board[row-1][col-1]]
       else:
