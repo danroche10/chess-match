@@ -3,6 +3,7 @@ from chess.constants import WIDTH, HEIGHT, SQUARE_SIZE
 from chess.game import Game
 from chess.board import Board
 from chess.pawn import Pawn
+from chess.piece_factory import PieceFactory
 
 FPS = 60
 
@@ -17,8 +18,8 @@ def get_row_col_from_mouse(pos):
 
 def main():
     run = True
-    pawn = Pawn
-    board = Board(pawn)
+    piece_factory = PieceFactory
+    board = Board(piece_factory)
     game = Game(WIN, board)
 
     while run:

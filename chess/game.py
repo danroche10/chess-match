@@ -1,5 +1,5 @@
 import pygame
-from .constants import WHITE, BLUE, SQUARE_SIZE
+from .constants import WHITE, BLACK, BLUE, SQUARE_SIZE
 
 class Game:
     def __init__(self, win, board):
@@ -29,7 +29,7 @@ class Game:
     def __init(self, board):
         self.selected = None
         self.board = board
-        self.turn = BLUE
+        self.turn = BLACK
         self.valid_moves = {}
 
     def __move(self, row, col):
@@ -51,10 +51,10 @@ class Game:
 
     def __change_turn(self):
         self.valid_moves = {}
-        if self.turn == BLUE:
+        if self.turn == BLACK:
             self.turn = WHITE
         else:
-            self.turn = BLUE
+            self.turn = BLACK
     
     # Below methods reach into board.py
     def __get_piece(self, row, col):
