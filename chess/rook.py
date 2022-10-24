@@ -22,6 +22,7 @@ class Rook(Piece):
                   moves = Helpers.update_valid_moves(moves, row, potential_move_col)
               elif board[row][potential_move_col].get_color() == WHITE:
                   moves = Helpers.update_valid_moves(moves, row, potential_move_col)
+                  moves[(row, potential_move_col)] = [board[row][potential_move_col]]
                   break
               elif board[row][col].get_color() == BLACK:
                   break
