@@ -33,6 +33,8 @@ class Board:
           moves = self.__get_valid_queen_moves(board, row, col, piece)
         elif piece.type == "KNIGHT":
           moves = self.__get_valid_knight_moves(board, row, col, piece)
+        elif piece.type == "KING":
+          moves = self.__get_valid_king_moves(board, row, col, piece)
         
         return moves
 
@@ -106,6 +108,10 @@ class Board:
     
     def __get_valid_knight_moves(self, board, row, col, piece):
         color = piece.color
-        return self.board[row][col].get_valid_knight_moves(board, row, col, color)   
+        return self.board[row][col].get_valid_knight_moves(board, row, col, color)
+
+    def __get_valid_king_moves(self, board, row, col, piece):
+        color = piece.color
+        return self.board[row][col].get_valid_king_moves(board, row, col, color)   
 
 
