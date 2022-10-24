@@ -33,12 +33,11 @@ class Game:
         self.valid_moves = {}
 
     def __move(self, row, col):
-        piece = self.__get_piece(row, col)
-        if self.selected and piece == 0 and (row, col) in self.valid_moves:
-            self.__move_piece_to_new_square(self.selected, row, col)
+        if self.selected and (row, col) in self.valid_moves:
             skipped_piece = self.valid_moves[(row, col)]
             if skipped_piece:
                 self.__remove_piece_from_board(skipped_piece)
+            self.__move_piece_to_new_square(self.selected, row, col)
             self.__change_turn()
         else:
             return False

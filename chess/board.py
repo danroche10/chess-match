@@ -5,8 +5,6 @@ class Board:
     def __init__(self, piece_factory):
         self.board = []
         self.piece_factory = piece_factory
-        self.red_left = self.white_left = 12
-        self.red_kings = self.white_kings = 0
         self.__create_board()
     
     def move(self, piece, row, col):
@@ -17,23 +15,18 @@ class Board:
         return self.board[row][col]
 
     def remove(self, pieces):
-        for piece in pieces:
-            self.board[piece.row][piece.col] = 0
-            if piece != 0:
-                if piece.get_color() == BLACK:
-                    self.red_left -= 1
-                else:
-                    self.white_left -= 1
+        self.board[pieces[0].row][pieces[0].col] = 0
         
     def get_valid_moves(self, piece):
         moves = {}
-
         row = piece.row
         col = piece.col
         board = self.board
         
         if piece.type == "PAWN":
           moves = self.__get_valid_pawn_moves(board, row, col, piece)
+        elif piece.type == "ROOK":
+          moves = self.__get_valid_rook_moves(board, row, col, piece)
 
         return moves
 
@@ -88,8 +81,13 @@ class Board:
           for col in range(row % 2, COLS, 2):
               pygame.draw.rect(win, RED, (row*SQUARE_SIZE, col *SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
-    # Below methods reach into pawn.py
+    # Below methods reach into piece extension methods
     def __get_valid_pawn_moves(self, board, row, col, piece):
-      color = piece.color
-      return self.board[row][col].get_valid_pawn_moves(board, row, col, color)
+        color = piece.color
+        return self.board[row][col].get_valid_pawn_moves(board, row, col, color)
+
+    def __get_valid_rook_moves(self, board, row, col, piece):
+        color = piece.color
+        return self.board[row][col].get_valid_rook_moves(board, row, col, color)
+
 

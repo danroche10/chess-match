@@ -2,7 +2,6 @@ import pygame
 from chess.constants import WIDTH, HEIGHT, SQUARE_SIZE
 from chess.game import Game
 from chess.board import Board
-from chess.pawn import Pawn
 from chess.piece_factory import PieceFactory
 
 FPS = 60
