@@ -27,7 +27,13 @@ class Board:
           moves = self.__get_valid_pawn_moves(board, row, col, piece)
         elif piece.type == "ROOK":
           moves = self.__get_valid_rook_moves(board, row, col, piece)
-
+        elif piece.type == "BISHOP":
+          moves = self.__get_valid_bishop_moves(board, row, col, piece)
+        elif piece.type == "QUEEN":
+          moves = self.__get_valid_queen_moves(board, row, col, piece)
+        elif piece.type == "KNIGHT":
+          moves = self.__get_valid_knight_moves(board, row, col, piece)
+        
         return moves
 
     def draw(self, win):
@@ -89,5 +95,17 @@ class Board:
     def __get_valid_rook_moves(self, board, row, col, piece):
         color = piece.color
         return self.board[row][col].get_valid_rook_moves(board, row, col, color)
+
+    def __get_valid_bishop_moves(self, board, row, col, piece):
+        color = piece.color
+        return self.board[row][col].get_valid_bishop_moves(board, row, col, color)
+    
+    def __get_valid_queen_moves(self, board, row, col, piece):
+        color = piece.color
+        return self.board[row][col].get_valid_queen_moves(board, row, col, color)
+    
+    def __get_valid_knight_moves(self, board, row, col, piece):
+        color = piece.color
+        return self.board[row][col].get_valid_knight_moves(board, row, col, color)   
 
 
