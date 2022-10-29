@@ -1,17 +1,17 @@
+from distutils.file_util import move_file
 import pygame
 from .constants import BLACK, LIGHT_GREY, ROWS, RED, SQUARE_SIZE, COLS, WHITE
 
 class Board:
     def __init__(self, piece_factory):
         self.board = []
+        self.potential_check_board = []
         self.piece_factory = piece_factory
         self.__create_board()
     
     def move(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move(row, col)
-        if self.is_in_check(piece.get_color()):
-          print("check")
     
     def get_piece(self, row, col): 
         return self.board[row][col]
@@ -26,7 +26,12 @@ class Board:
         board = self.board
         
         if piece.type == "PAWN":
-          moves = self.__get_valid_pawn_moves(board, row, col, piece)
+          potential_moves = self.__get_valid_pawn_moves(board, row, col, piece)
+          for key in potential_moves:
+            if self.this_moves_player_into_check(piece, key[0], key[1]):
+              del potential_moves[key]
+              moves = potential_moves
+          moves = potential_moves     
         elif piece.type == "ROOK":
           moves = self.__get_valid_rook_moves(board, row, col, piece)
         elif piece.type == "BISHOP":
@@ -93,10 +98,10 @@ class Board:
 
     # Below methods reach into piece extension methods
     # check logic
-    def is_in_check(self, color):
+    def is_opponent_in_check(self, color):
       valid_moves_for_one_color = self.get_all_valid_moves_for_one_colour(color)
       for valid_move in valid_moves_for_one_color:
-        if self.board[valid_move[0]][valid_move[1]] != 0 and self.board[valid_move[0]][valid_move[1]].get_type() == "KING":
+        if self.potential_check_board[valid_move[0]][valid_move[1]] != 0 and self.potential_check_board[valid_move[0]][valid_move[1]].get_type() == "KING":
           return True
       return False
     
@@ -104,13 +109,13 @@ class Board:
         valid_moves = []
         for row in range(ROWS):
           for col in range(COLS):
-            if self.board[row][col] != 0 and self.board[row][col].get_color() == color:
-              if self.board[row][col].get_type() == "PAWN":
-                  valid_pawn_moves = list(self.__get_valid_pawn_moves(self.board, row, col, self.board[row][col]).keys())
+            if self.potential_check_board[row][col] != 0 and self.potential_check_board[row][col].get_color() == color:
+              if self.potential_check_board[row][col].get_type() == "PAWN":
+                  valid_pawn_moves = list(self.__get_valid_pawn_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
                   for move in valid_pawn_moves:
                     valid_moves.append(move)
               elif self.board[row][col].get_type() == "ROOK":
-                  valid_rook_moves = list(self.__get_valid_rook_moves(self.board, row, col, self.board[row][col]).keys())
+                  valid_rook_moves = list(self.__get_valid_rook_moves(self.potential_check_board, row, col, self.board[row][col]).keys())
                   for move in valid_rook_moves:
                     valid_moves.append(move)
               elif self.board[row][col].get_type() == "KNIGHT":
@@ -132,10 +137,19 @@ class Board:
           
         return valid_moves
     
+    def this_moves_player_into_check(self, piece, row, col):
+        self.potential_check_board = self.board.copy()
+        moving_piece = copy.copy(piece)
+        self.potential_check_board[moving_piece.row][moving_piece.col], self.potential_check_board[row][col] = self.potential_check_board[row][col], self.potential_check_board[moving_piece.row][moving_piece.col]
+        if (piece.get_color() == BLACK):
+          return self.is_opponent_in_check(WHITE)
+        else:
+          return self.is_opponent_in_check(BLACK)
+    
     def __get_valid_pawn_moves(self, board, row, col, piece):
-        color = piece.color
-        return self.board[row][col].get_valid_pawn_moves(board, row, col, color)
-
+        color = piece.get_color()
+        return self.board[row][col].get_valid_pawn_moves(board, row, col, color)     
+    
     def __get_valid_rook_moves(self, board, row, col, piece):
         color = piece.color
         return self.board[row][col].get_valid_rook_moves(board, row, col, color)
