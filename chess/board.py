@@ -10,6 +10,8 @@ class Board:
     def move(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move(row, col)
+        if self.is_in_check(piece.get_color()):
+          print("check")
     
     def get_piece(self, row, col): 
         return self.board[row][col]
@@ -90,6 +92,46 @@ class Board:
               pygame.draw.rect(win, RED, (row*SQUARE_SIZE, col *SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
     # Below methods reach into piece extension methods
+    # check logic
+    def is_in_check(self, color):
+      valid_moves_for_one_color = self.get_all_valid_moves_for_one_colour(color)
+      for valid_move in valid_moves_for_one_color:
+        if self.board[valid_move[0]][valid_move[1]] != 0 and self.board[valid_move[0]][valid_move[1]].get_type() == "KING":
+          return True
+      return False
+    
+    def get_all_valid_moves_for_one_colour(self, color):
+        valid_moves = []
+        for row in range(ROWS):
+          for col in range(COLS):
+            if self.board[row][col] != 0 and self.board[row][col].get_color() == color:
+              if self.board[row][col].get_type() == "PAWN":
+                  valid_pawn_moves = list(self.__get_valid_pawn_moves(self.board, row, col, self.board[row][col]).keys())
+                  for move in valid_pawn_moves:
+                    valid_moves.append(move)
+              elif self.board[row][col].get_type() == "ROOK":
+                  valid_rook_moves = list(self.__get_valid_rook_moves(self.board, row, col, self.board[row][col]).keys())
+                  for move in valid_rook_moves:
+                    valid_moves.append(move)
+              elif self.board[row][col].get_type() == "KNIGHT":
+                  valid_knight_moves = list(self.__get_valid_knight_moves(self.board, row, col, self.board[row][col]).keys())
+                  for move in valid_knight_moves:
+                    valid_moves.append(move)
+              elif self.board[row][col].get_type() == "BISHOP":
+                  valid_bishop_moves = list(self.__get_valid_bishop_moves(self.board, row, col, self.board[row][col]).keys())
+                  for move in valid_bishop_moves:
+                    valid_moves.append(move)
+              elif self.board[row][col].get_type() == "KING":
+                  valid_king_moves = list(self.__get_valid_king_moves(self.board, row, col, self.board[row][col]).keys())
+                  for move in valid_king_moves:
+                    valid_moves.append(move)
+              elif self.board[row][col].get_type() == "QUEEN":
+                  valid_queen_moves = list(self.__get_valid_queen_moves(self.board, row, col, self.board[row][col]).keys())
+                  for move in valid_queen_moves:
+                    valid_moves.append(move)
+          
+        return valid_moves
+    
     def __get_valid_pawn_moves(self, board, row, col, piece):
         color = piece.color
         return self.board[row][col].get_valid_pawn_moves(board, row, col, color)
