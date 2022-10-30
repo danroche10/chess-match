@@ -57,7 +57,7 @@ class Knight(Piece):
         if col <= 5 and row >= 1:
             if board[row-1][col+2] == 0:
                 moves = Helpers.update_valid_moves(moves, row-1, col+2)
-            elif (board[row-1][col+2].get_color() == WHITE and color == BLACK) or (board[row-1][col+1].get_color() == BLACK and color == WHITE):
+            elif (board[row-1][col+2].get_color() == WHITE and color == BLACK) or (board[row-1][col+2].get_color() == BLACK and color == WHITE):
                 moves = Helpers.update_valid_moves(moves, row+2, col-1)
                 moves[(row-1, col+2)] = [board[row-1][col+2]]
         

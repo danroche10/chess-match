@@ -8,11 +8,12 @@ class Board:
         self.potential_check_board = []
         self.piece_factory = piece_factory
         self.__create_board()
-        self.__create_fake_board()
     
     def move(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move(row, col)
+        if self.this_moves_player_into_check(piece, row, col):
+          print("check")
     
     def get_piece(self, row, col): 
         return self.board[row][col]
@@ -32,15 +33,30 @@ class Board:
             if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
               moves[key] = potential_moves[key]
         elif piece.type == "ROOK":
-          moves = self.__get_valid_rook_moves(board, row, col, piece)
+          potential_moves = self.__get_valid_rook_moves(board, row, col, piece)
+          for key in potential_moves:
+            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+              moves[key] = potential_moves[key]
         elif piece.type == "BISHOP":
-          moves = self.__get_valid_bishop_moves(board, row, col, piece)
+          potential_moves = self.__get_valid_bishop_moves(board, row, col, piece)
+          for key in potential_moves:
+            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+              moves[key] = potential_moves[key]
         elif piece.type == "QUEEN":
-          moves = self.__get_valid_queen_moves(board, row, col, piece)
+          potential_moves = self.__get_valid_queen_moves(board, row, col, piece)
+          for key in potential_moves:
+            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+              moves[key] = potential_moves[key]
         elif piece.type == "KNIGHT":
-          moves = self.__get_valid_knight_moves(board, row, col, piece)
+          potential_moves = self.__get_valid_knight_moves(board, row, col, piece)
+          for key in potential_moves:
+            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+              moves[key] = potential_moves[key]
         elif piece.type == "KING":
-          moves = self.__get_valid_king_moves(board, row, col, piece)
+          potential_moves = self.__get_valid_king_moves(board, row, col, piece)
+          for key in potential_moves:
+            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+              moves[key] = potential_moves[key]
         
         return moves
 
@@ -88,43 +104,6 @@ class Board:
                       self.board[row].append(0)
               else:
                   self.board[row].append(0)
-    
-    def __create_fake_board(self):
-      for row in range(ROWS):
-          self.potential_check_board.append([])
-          for col in range(COLS):
-              if row == 0:
-                  if col == 0 or col == 7:
-                      self.potential_check_board[row].append(self.piece_factory.new_rook(row, col, WHITE))
-                  elif col == 1 or col == 6:
-                      self.potential_check_board[row].append(self.piece_factory.new_knight(row, col, WHITE))
-                  elif col == 2 or col == 5:
-                      self.potential_check_board[row].append(self.piece_factory.new_bishop(row, col, WHITE))
-                  elif col == 3:
-                      self.potential_check_board[row].append(self.piece_factory.new_queen(row, col, WHITE))
-                  elif col == 4:
-                      self.potential_check_board[row].append(self.piece_factory.new_king(row, col, WHITE))
-                  else:
-                      self.potential_check_board[row].append(0)
-              elif row == 1:
-                  self.potential_check_board[row].append(self.piece_factory.new_pawn(row, col, WHITE))
-              elif row == 6:
-                  self.potential_check_board[row].append(self.piece_factory.new_pawn(row, col, BLACK))
-              elif row == 7:
-                  if col == 0 or col == 7:
-                      self.potential_check_board[row].append(self.piece_factory.new_rook(row, col, BLACK))
-                  elif col == 1 or col == 6:
-                      self.potential_check_board[row].append(self.piece_factory.new_knight(row, col, BLACK))
-                  elif col == 2 or col == 5:
-                      self.potential_check_board[row].append(self.piece_factory.new_bishop(row, col, BLACK))
-                  elif col == 3:
-                      self.potential_check_board[row].append(self.piece_factory.new_queen(row, col, BLACK))
-                  elif col == 4:
-                      self.potential_check_board[row].append(self.piece_factory.new_king(row, col, BLACK))
-                  else:
-                      self.potential_check_board[row].append(0)
-              else:
-                  self.potential_check_board[row].append(0)
 
     def __draw_squares(self, win):
       win.fill(LIGHT_GREY)
@@ -137,7 +116,7 @@ class Board:
     def is_opponent_in_check(self, color):
       valid_moves_for_one_color = self.get_all_valid_moves_for_one_colour(color)
       for valid_move in valid_moves_for_one_color:
-        if self.potential_check_board[valid_move[0]][valid_move[1]] != 0 and self.potential_check_board[valid_move[0]][valid_move[1]].get_type() == "KING":
+        if self.potential_check_board[valid_move[0]][valid_move[1]] != 0 and self.potential_check_board[valid_move[0]][valid_move[1]].get_type() == "KING" and self.potential_check_board[valid_move[0]][valid_move[1]].get_color():
           return True
       return False
     
@@ -150,24 +129,24 @@ class Board:
                   valid_pawn_moves = list(self.__get_valid_pawn_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
                   for move in valid_pawn_moves:
                     valid_moves.append(move)
-              elif self.board[row][col].get_type() == "ROOK":
-                  valid_rook_moves = list(self.__get_valid_rook_moves(self.potential_check_board, row, col, self.board[row][col]).keys())
+              elif self.potential_check_board[row][col].get_type() == "ROOK":
+                  valid_rook_moves = list(self.__get_valid_rook_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
                   for move in valid_rook_moves:
                     valid_moves.append(move)
-              elif self.board[row][col].get_type() == "KNIGHT":
-                  valid_knight_moves = list(self.__get_valid_knight_moves(self.board, row, col, self.board[row][col]).keys())
+              elif self.potential_check_board[row][col].get_type() == "KNIGHT":
+                  valid_knight_moves = list(self.__get_valid_knight_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
                   for move in valid_knight_moves:
                     valid_moves.append(move)
               elif self.potential_check_board[row][col].get_type() == "BISHOP":
                   valid_bishop_moves = list(self.__get_valid_bishop_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
                   for move in valid_bishop_moves:
                     valid_moves.append(move)
-              elif self.board[row][col].get_type() == "KING":
-                  valid_king_moves = list(self.__get_valid_king_moves(self.board, row, col, self.board[row][col]).keys())
+              elif self.potential_check_board[row][col].get_type() == "KING":
+                  valid_king_moves = list(self.__get_valid_king_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
                   for move in valid_king_moves:
                     valid_moves.append(move)
-              elif self.board[row][col].get_type() == "QUEEN":
-                  valid_queen_moves = list(self.__get_valid_queen_moves(self.board, row, col, self.board[row][col]).keys())
+              elif self.potential_check_board[row][col].get_type() == "QUEEN":
+                  valid_queen_moves = list(self.__get_valid_queen_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
                   for move in valid_queen_moves:
                     valid_moves.append(move)
           
@@ -183,26 +162,26 @@ class Board:
     
     def __get_valid_pawn_moves(self, board, row, col, piece):
         color = piece.get_color()
-        return self.board[row][col].get_valid_pawn_moves(board, row, col, color)     
+        return board[row][col].get_valid_pawn_moves(board, row, col, color)     
     
     def __get_valid_rook_moves(self, board, row, col, piece):
         color = piece.color
-        return self.board[row][col].get_valid_rook_moves(board, row, col, color)
+        return board[row][col].get_valid_rook_moves(board, row, col, color)
 
     def __get_valid_bishop_moves(self, board, row, col, piece):
         color = piece.color
-        return self.board[row][col].get_valid_bishop_moves(board, row, col, color)
+        return board[row][col].get_valid_bishop_moves(board, row, col, color)
     
     def __get_valid_queen_moves(self, board, row, col, piece):
         color = piece.color
-        return self.board[row][col].get_valid_queen_moves(board, row, col, color)
+        return board[row][col].get_valid_queen_moves(board, row, col, color)
     
     def __get_valid_knight_moves(self, board, row, col, piece):
         color = piece.color
-        return self.board[row][col].get_valid_knight_moves(board, row, col, color)
+        return board[row][col].get_valid_knight_moves(board, row, col, color)
 
     def __get_valid_king_moves(self, board, row, col, piece):
         color = piece.color
-        return self.board[row][col].get_valid_king_moves(board, row, col, color)   
+        return board[row][col].get_valid_king_moves(board, row, col, color)   
 
 
