@@ -1,5 +1,5 @@
-from distutils.file_util import move_file
 import pygame
+import copy
 from .constants import BLACK, LIGHT_GREY, ROWS, RED, SQUARE_SIZE, COLS, WHITE
 
 class Board:
@@ -8,6 +8,7 @@ class Board:
         self.potential_check_board = []
         self.piece_factory = piece_factory
         self.__create_board()
+        self.__create_fake_board()
     
     def move(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
@@ -28,10 +29,8 @@ class Board:
         if piece.type == "PAWN":
           potential_moves = self.__get_valid_pawn_moves(board, row, col, piece)
           for key in potential_moves:
-            if self.this_moves_player_into_check(piece, key[0], key[1]):
-              del potential_moves[key]
-              moves = potential_moves
-          moves = potential_moves     
+            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+              moves[key] = potential_moves[key]
         elif piece.type == "ROOK":
           moves = self.__get_valid_rook_moves(board, row, col, piece)
         elif piece.type == "BISHOP":
@@ -89,6 +88,43 @@ class Board:
                       self.board[row].append(0)
               else:
                   self.board[row].append(0)
+    
+    def __create_fake_board(self):
+      for row in range(ROWS):
+          self.potential_check_board.append([])
+          for col in range(COLS):
+              if row == 0:
+                  if col == 0 or col == 7:
+                      self.potential_check_board[row].append(self.piece_factory.new_rook(row, col, WHITE))
+                  elif col == 1 or col == 6:
+                      self.potential_check_board[row].append(self.piece_factory.new_knight(row, col, WHITE))
+                  elif col == 2 or col == 5:
+                      self.potential_check_board[row].append(self.piece_factory.new_bishop(row, col, WHITE))
+                  elif col == 3:
+                      self.potential_check_board[row].append(self.piece_factory.new_queen(row, col, WHITE))
+                  elif col == 4:
+                      self.potential_check_board[row].append(self.piece_factory.new_king(row, col, WHITE))
+                  else:
+                      self.potential_check_board[row].append(0)
+              elif row == 1:
+                  self.potential_check_board[row].append(self.piece_factory.new_pawn(row, col, WHITE))
+              elif row == 6:
+                  self.potential_check_board[row].append(self.piece_factory.new_pawn(row, col, BLACK))
+              elif row == 7:
+                  if col == 0 or col == 7:
+                      self.potential_check_board[row].append(self.piece_factory.new_rook(row, col, BLACK))
+                  elif col == 1 or col == 6:
+                      self.potential_check_board[row].append(self.piece_factory.new_knight(row, col, BLACK))
+                  elif col == 2 or col == 5:
+                      self.potential_check_board[row].append(self.piece_factory.new_bishop(row, col, BLACK))
+                  elif col == 3:
+                      self.potential_check_board[row].append(self.piece_factory.new_queen(row, col, BLACK))
+                  elif col == 4:
+                      self.potential_check_board[row].append(self.piece_factory.new_king(row, col, BLACK))
+                  else:
+                      self.potential_check_board[row].append(0)
+              else:
+                  self.potential_check_board[row].append(0)
 
     def __draw_squares(self, win):
       win.fill(LIGHT_GREY)
@@ -122,8 +158,8 @@ class Board:
                   valid_knight_moves = list(self.__get_valid_knight_moves(self.board, row, col, self.board[row][col]).keys())
                   for move in valid_knight_moves:
                     valid_moves.append(move)
-              elif self.board[row][col].get_type() == "BISHOP":
-                  valid_bishop_moves = list(self.__get_valid_bishop_moves(self.board, row, col, self.board[row][col]).keys())
+              elif self.potential_check_board[row][col].get_type() == "BISHOP":
+                  valid_bishop_moves = list(self.__get_valid_bishop_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
                   for move in valid_bishop_moves:
                     valid_moves.append(move)
               elif self.board[row][col].get_type() == "KING":
@@ -138,9 +174,8 @@ class Board:
         return valid_moves
     
     def this_moves_player_into_check(self, piece, row, col):
-        self.potential_check_board = self.board.copy()
-        moving_piece = copy.copy(piece)
-        self.potential_check_board[moving_piece.row][moving_piece.col], self.potential_check_board[row][col] = self.potential_check_board[row][col], self.potential_check_board[moving_piece.row][moving_piece.col]
+        self.potential_check_board = copy.deepcopy(self.board)
+        self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = self.potential_check_board[row][col], self.potential_check_board[piece.row][piece.col]
         if (piece.get_color() == BLACK):
           return self.is_opponent_in_check(WHITE)
         else:
