@@ -42,7 +42,7 @@ class Bishop(Piece):
               moves = Helpers.update_valid_moves(moves, potential_move_row, potential_move_col)
               moves[(potential_move_row, potential_move_col)] = [board[potential_move_row][potential_move_col]]
               break
-          elif (board[row][potential_move_col].get_color() == BLACK and color == BLACK) or (board[row][potential_move_col].get_color() == WHITE and color == WHITE):
+          elif (board[potential_move_row][potential_move_col].get_color() == BLACK and color == BLACK) or (board[potential_move_row][potential_move_col].get_color() == WHITE and color == WHITE):
               break
         potential_move_col = col
         potential_move_row = row

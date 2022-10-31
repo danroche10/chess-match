@@ -12,8 +12,8 @@ class Board:
     def move(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move(row, col)
-        if self.this_moves_player_into_check(piece, row, col):
-          print("check")
+        if self.__this_moves_opp_player_into_check(piece, row, col):
+          print("White is in check") if piece.get_color() == BLACK else print("Black is in check")
     
     def get_piece(self, row, col): 
         return self.board[row][col]
@@ -27,35 +27,35 @@ class Board:
         col = piece.col
         board = self.board
         
-        if piece.type == "PAWN":
+        if piece.get_type() == "PAWN":
           potential_moves = self.__get_valid_pawn_moves(board, row, col, piece)
           for key in potential_moves:
-            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
               moves[key] = potential_moves[key]
-        elif piece.type == "ROOK":
+        elif piece.get_type() == "ROOK":
           potential_moves = self.__get_valid_rook_moves(board, row, col, piece)
           for key in potential_moves:
-            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
               moves[key] = potential_moves[key]
-        elif piece.type == "BISHOP":
+        elif piece.get_type() == "BISHOP":
           potential_moves = self.__get_valid_bishop_moves(board, row, col, piece)
           for key in potential_moves:
-            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
               moves[key] = potential_moves[key]
-        elif piece.type == "QUEEN":
+        elif piece.get_type() == "QUEEN":
           potential_moves = self.__get_valid_queen_moves(board, row, col, piece)
           for key in potential_moves:
-            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
               moves[key] = potential_moves[key]
-        elif piece.type == "KNIGHT":
+        elif piece.get_type() == "KNIGHT":
           potential_moves = self.__get_valid_knight_moves(board, row, col, piece)
           for key in potential_moves:
-            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
               moves[key] = potential_moves[key]
-        elif piece.type == "KING":
+        elif piece.get_type() == "KING":
           potential_moves = self.__get_valid_king_moves(board, row, col, piece)
           for key in potential_moves:
-            if self.this_moves_player_into_check(piece, key[0], key[1]) == False:
+            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
               moves[key] = potential_moves[key]
         
         return moves
@@ -113,14 +113,14 @@ class Board:
 
     # Below methods reach into piece extension methods
     # check logic
-    def is_opponent_in_check(self, color):
-      valid_moves_for_one_color = self.get_all_valid_moves_for_one_colour(color)
+    def __is_opponent_in_check(self, color):
+      valid_moves_for_one_color = self.__get_all_valid_moves_for_one_colour(color)
       for valid_move in valid_moves_for_one_color:
-        if self.potential_check_board[valid_move[0]][valid_move[1]] != 0 and self.potential_check_board[valid_move[0]][valid_move[1]].get_type() == "KING" and self.potential_check_board[valid_move[0]][valid_move[1]].get_color():
+        if self.potential_check_board[valid_move[0]][valid_move[1]] != 0 and (self.potential_check_board[valid_move[0]][valid_move[1]].get_type() == "KING"):
           return True
       return False
     
-    def get_all_valid_moves_for_one_colour(self, color):
+    def __get_all_valid_moves_for_one_colour(self, color):
         valid_moves = []
         for row in range(ROWS):
           for col in range(COLS):
@@ -152,13 +152,21 @@ class Board:
           
         return valid_moves
     
-    def this_moves_player_into_check(self, piece, row, col):
+    def __this_moves_player_into_check(self, piece, row, col):
+        self.potential_check_board = copy.deepcopy(self.board)
+        self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = 0, self.potential_check_board[piece.row][piece.col]
+        if (piece.get_color() == BLACK):
+          return self.__is_opponent_in_check(WHITE)
+        else:
+          return self.__is_opponent_in_check(BLACK)
+
+    def __this_moves_opp_player_into_check(self, piece, row, col):
         self.potential_check_board = copy.deepcopy(self.board)
         self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = self.potential_check_board[row][col], self.potential_check_board[piece.row][piece.col]
         if (piece.get_color() == BLACK):
-          return self.is_opponent_in_check(WHITE)
+          return self.__is_opponent_in_check(BLACK)
         else:
-          return self.is_opponent_in_check(BLACK)
+          return self.__is_opponent_in_check(WHITE)
     
     def __get_valid_pawn_moves(self, board, row, col, piece):
         color = piece.get_color()
