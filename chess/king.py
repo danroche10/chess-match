@@ -18,7 +18,7 @@ class King(Piece):
             if board[row][col+1] == 0:
                 moves = Helpers.update_valid_moves(moves, row, col+1)
             elif (board[row][col+1].get_color() == WHITE and color == BLACK) or (board[row][col+1].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row-2, col+1)
+                moves = Helpers.update_valid_moves(moves, row, col+1)
                 moves[(row, col+1)] = [board[row][col+1]]
         if col >=1:
             if board[row][col-1] == 0:
@@ -54,7 +54,7 @@ class King(Piece):
             if board[row+1][col+1] == 0:
                 moves = Helpers.update_valid_moves(moves, row+1, col+1)
             elif (board[row+1][col+1].get_color() == WHITE and color == BLACK) or (board[row+1][col+1].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row+1, col+2)
+                moves = Helpers.update_valid_moves(moves, row+1, col+1)
                 moves[(row+1, col+1)] = [board[row+1][col+1]]
         if row <= 6 and col >= 1:
             if board[row+1][col-1] == 0:

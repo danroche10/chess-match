@@ -29,7 +29,7 @@ class Game:
     def __init(self, board):
         self.selected = None
         self.board = board
-        self.turn = BLACK
+        self.turn = WHITE
         self.valid_moves = {}
 
     def __move(self, row, col):

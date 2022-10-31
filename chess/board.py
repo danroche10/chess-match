@@ -13,7 +13,9 @@ class Board:
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move(row, col)
         if self.__this_moves_opp_player_into_check(piece, row, col):
-          print("White is in check") if piece.get_color() == BLACK else print("Black is in check")
+          if piece.get_color() == BLACK:
+            print("White is in check") 
+          else: print("Black is in check")
     
     def get_piece(self, row, col): 
         return self.board[row][col]
@@ -117,7 +119,8 @@ class Board:
       valid_moves_for_one_color = self.__get_all_valid_moves_for_one_colour(color)
       for valid_move in valid_moves_for_one_color:
         if self.potential_check_board[valid_move[0]][valid_move[1]] != 0 and (self.potential_check_board[valid_move[0]][valid_move[1]].get_type() == "KING"):
-          return True
+          if self.potential_check_board[valid_move[0]][valid_move[1]].get_color() != color:
+              return True
       return False
     
     def __get_all_valid_moves_for_one_colour(self, color):
@@ -162,7 +165,7 @@ class Board:
 
     def __this_moves_opp_player_into_check(self, piece, row, col):
         self.potential_check_board = copy.deepcopy(self.board)
-        self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = self.potential_check_board[row][col], self.potential_check_board[piece.row][piece.col]
+        self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = 0, self.potential_check_board[piece.row][piece.col]
         if (piece.get_color() == BLACK):
           return self.__is_opponent_in_check(BLACK)
         else:
