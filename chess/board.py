@@ -7,10 +7,11 @@ class Board:
         self.board = []
         self.potential_check_board = []
         self.piece_factory = piece_factory
+        self.pieces = ["PAWN", "ROOK", "KNIGHT", "BISHOP", "QUEEN", "KING"]
         self.__create_board()
     
     def move(self, piece, row, col):
-        self.board[piece.row][piece.col], self.board[row][col] = 0, self.board[piece.row][piece.col]
+        self.board[piece.row][piece.col], self.board[row][col] = 0, self.get_piece(piece.row, piece.col)
         piece.move(row, col)
         if self.__this_moves_opp_player_into_check(piece, row, col):
           if piece.get_color() == BLACK:
@@ -19,57 +20,85 @@ class Board:
     
     def get_piece(self, row, col): 
         return self.board[row][col]
+    
+    def get_piece_from_potential_check_board(self, row, col): 
+        return self.potential_check_board[row][col]
 
     def remove(self, pieces):
         self.board[pieces[0].row][pieces[0].col] = 0
-        
-    def get_valid_moves(self, piece):
+    
+    # Below methods reach into piece extension methods
+    def get_valid_moves(self, piece_to_play):
         moves = {}
-        row = piece.row
-        col = piece.col
+        row = piece_to_play.row
+        col = piece_to_play.col
         board = self.board
         
-        if piece.get_type() == "PAWN":
-          potential_moves = self.__get_valid_pawn_moves(board, row, col, piece)
-          for key in potential_moves:
-            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
-              moves[key] = potential_moves[key]
-        elif piece.get_type() == "ROOK":
-          potential_moves = self.__get_valid_rook_moves(board, row, col, piece)
-          for key in potential_moves:
-            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
-              moves[key] = potential_moves[key]
-        elif piece.get_type() == "BISHOP":
-          potential_moves = self.__get_valid_bishop_moves(board, row, col, piece)
-          for key in potential_moves:
-            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
-              moves[key] = potential_moves[key]
-        elif piece.get_type() == "QUEEN":
-          potential_moves = self.__get_valid_queen_moves(board, row, col, piece)
-          for key in potential_moves:
-            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
-              moves[key] = potential_moves[key]
-        elif piece.get_type() == "KNIGHT":
-          potential_moves = self.__get_valid_knight_moves(board, row, col, piece)
-          for key in potential_moves:
-            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
-              moves[key] = potential_moves[key]
-        elif piece.get_type() == "KING":
-          potential_moves = self.__get_valid_king_moves(board, row, col, piece)
-          for key in potential_moves:
-            if self.__this_moves_player_into_check(piece, key[0], key[1]) == False:
-              moves[key] = potential_moves[key]
-        
+        for piece in self.pieces:
+          if piece_to_play.get_type() == piece:
+            piece_method = f'get_valid_{piece.lower()}_moves'
+            potential_moves = getattr(piece_to_play, piece_method)(board, row, col, piece_to_play.get_color())
+            for key in potential_moves:
+              if self.__this_moves_player_into_check(piece_to_play, key[0], key[1]) == False:
+                moves[key] = potential_moves[key]
         return moves
+    
+    def __is_opponent_in_check(self, color):
+        valid_moves_for_one_color = self.__get_all_valid_moves_for_one_colour(color)
+        for valid_move in valid_moves_for_one_color:
+          if self.get_piece_from_potential_check_board(valid_move[0], valid_move[1]) != 0 and (self.get_piece_from_potential_check_board(valid_move[0], valid_move[1]).get_type() == "KING"):
+            if self.get_piece_from_potential_check_board(valid_move[0], valid_move[1]).get_color() != color:
+                return True
+        return False
 
-    def draw(self, win):
-      self.__draw_squares(win)
-      for row in range(ROWS):
+    def __is_opponent_in_check_mate(self, color):
+        valid_moves = []
+        for row in range(ROWS):
           for col in range(COLS):
-              piece = self.board[row][col]                             
-              if piece != 0:
-                  piece.create(win, row, col)
+            if self.get_piece_from_potential_check_board(row, col) != 0 and self.get_piece_from_potential_check_board(row, col).get_color() == color:
+              valid_moves.append(self.get_valid_moves(self.get_piece_from_potential_check_board(row, col)))
+        
+        new_list = [item for item in valid_moves if item]
+        if new_list == []:
+          print(("Check mate!!"))
+          # end game
+          return True
+        else:
+          return False
+    
+    def __get_all_valid_moves_for_one_colour(self, color):
+        valid_moves = []
+        for row in range(ROWS):
+          for col in range(COLS):
+            if self.get_piece_from_potential_check_board(row, col) != 0 and self.get_piece_from_potential_check_board(row, col).get_color() == color:
+              for piece in self.pieces:
+                if self.get_piece_from_potential_check_board(row, col).get_type() == piece:
+                  piece_method = f'get_valid_{piece.lower()}_moves'
+                  valid_piece_moves = list(getattr(self.get_piece_from_potential_check_board(row, col), piece_method)(self.potential_check_board, row, col, color))
+                  for move in valid_piece_moves:
+                      valid_moves.append(move)
+        
+        return valid_moves
 
+    def __this_moves_player_into_check(self, piece, row, col):
+      self.potential_check_board = copy.deepcopy(self.board)
+      self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col]  = 0, self.get_piece_from_potential_check_board(piece.row, piece.col)
+      if (piece.get_color() == BLACK):
+        return self.__is_opponent_in_check(WHITE)
+      else:
+        return self.__is_opponent_in_check(BLACK)
+
+    def __this_moves_opp_player_into_check(self, piece, row, col):
+      self.potential_check_board = copy.deepcopy(self.board)
+      self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = 0, self.get_piece_from_potential_check_board(piece.row, piece.col)
+      if (piece.get_color() == BLACK):
+        self.__is_opponent_in_check_mate(WHITE)
+        return self.__is_opponent_in_check(BLACK)
+      else:
+        self.__is_opponent_in_check_mate(BLACK)
+        return self.__is_opponent_in_check(WHITE)
+
+    # methods for drawing board
     def __create_board(self):
       for row in range(ROWS):
           self.board.append([])
@@ -107,109 +136,16 @@ class Board:
               else:
                   self.board[row].append(0)
 
+    def draw(self, win):
+      self.__draw_squares(win)
+      for row in range(ROWS):
+          for col in range(COLS):
+              piece = self.get_piece(row, col)                          
+              if piece != 0:
+                  piece.create(win, row, col)
+
     def __draw_squares(self, win):
       win.fill(LIGHT_GREY)
       for row in range(ROWS):
           for col in range(row % 2, COLS, 2):
               pygame.draw.rect(win, RED, (row*SQUARE_SIZE, col *SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
-
-    # Below methods reach into piece extension methods
-    # check logic
-    def __is_opponent_in_check(self, color):
-      valid_moves_for_one_color = self.__get_all_valid_moves_for_one_colour(color)
-      for valid_move in valid_moves_for_one_color:
-        if self.potential_check_board[valid_move[0]][valid_move[1]] != 0 and (self.potential_check_board[valid_move[0]][valid_move[1]].get_type() == "KING"):
-          if self.potential_check_board[valid_move[0]][valid_move[1]].get_color() != color:
-              return True
-      return False
-
-    def __is_opponent_in_check_mate(self, color):
-        valid_moves = []
-        for row in range(ROWS):
-          for col in range(COLS):
-            if self.potential_check_board[row][col] != 0 and self.potential_check_board[row][col].get_color() == color:
-              valid_moves.append(self.get_valid_moves(self.potential_check_board[row][col]))
-        
-        new_list = [item for item in valid_moves if item]
-        if new_list == []:
-          print(("Check mate!!"))
-          # end game
-          return True
-        else:
-          return False
-
-    def __get_all_valid_moves_for_one_colour(self, color):
-        valid_moves = []
-        for row in range(ROWS):
-          for col in range(COLS):
-            if self.potential_check_board[row][col] != 0 and self.potential_check_board[row][col].get_color() == color:
-              if self.potential_check_board[row][col].get_type() == "PAWN":
-                  valid_pawn_moves = list(self.__get_valid_pawn_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
-                  for move in valid_pawn_moves:
-                    valid_moves.append(move)
-              elif self.potential_check_board[row][col].get_type() == "ROOK":
-                  valid_rook_moves = list(self.__get_valid_rook_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
-                  for move in valid_rook_moves:
-                    valid_moves.append(move)
-              elif self.potential_check_board[row][col].get_type() == "KNIGHT":
-                  valid_knight_moves = list(self.__get_valid_knight_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
-                  for move in valid_knight_moves:
-                    valid_moves.append(move)
-              elif self.potential_check_board[row][col].get_type() == "BISHOP":
-                  valid_bishop_moves = list(self.__get_valid_bishop_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
-                  for move in valid_bishop_moves:
-                    valid_moves.append(move)
-              elif self.potential_check_board[row][col].get_type() == "KING":
-                  valid_king_moves = list(self.__get_valid_king_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
-                  for move in valid_king_moves:
-                    valid_moves.append(move)
-              elif self.potential_check_board[row][col].get_type() == "QUEEN":
-                  valid_queen_moves = list(self.__get_valid_queen_moves(self.potential_check_board, row, col, self.potential_check_board[row][col]).keys())
-                  for move in valid_queen_moves:
-                    valid_moves.append(move)
-          
-        return valid_moves
-    
-    def __this_moves_player_into_check(self, piece, row, col):
-        self.potential_check_board = copy.deepcopy(self.board)
-        self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = 0, self.potential_check_board[piece.row][piece.col]
-        if (piece.get_color() == BLACK):
-          return self.__is_opponent_in_check(WHITE)
-        else:
-          return self.__is_opponent_in_check(BLACK)
-
-    def __this_moves_opp_player_into_check(self, piece, row, col):
-        self.potential_check_board = copy.deepcopy(self.board)
-        self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = 0, self.potential_check_board[piece.row][piece.col]
-        if (piece.get_color() == BLACK):
-          self.__is_opponent_in_check_mate(WHITE)
-          return self.__is_opponent_in_check(BLACK)
-        else:
-          self.__is_opponent_in_check_mate(BLACK)
-          return self.__is_opponent_in_check(WHITE)
-    
-    def __get_valid_pawn_moves(self, board, row, col, piece):
-        color = piece.get_color()
-        return board[row][col].get_valid_pawn_moves(board, row, col, color)     
-    
-    def __get_valid_rook_moves(self, board, row, col, piece):
-        color = piece.color
-        return board[row][col].get_valid_rook_moves(board, row, col, color)
-
-    def __get_valid_bishop_moves(self, board, row, col, piece):
-        color = piece.color
-        return board[row][col].get_valid_bishop_moves(board, row, col, color)
-    
-    def __get_valid_queen_moves(self, board, row, col, piece):
-        color = piece.color
-        return board[row][col].get_valid_queen_moves(board, row, col, color)
-    
-    def __get_valid_knight_moves(self, board, row, col, piece):
-        color = piece.color
-        return board[row][col].get_valid_knight_moves(board, row, col, color)
-
-    def __get_valid_king_moves(self, board, row, col, piece):
-        color = piece.color
-        return board[row][col].get_valid_king_moves(board, row, col, color)   
-
-
