@@ -10,7 +10,7 @@ class Board:
         self.__create_board()
     
     def move(self, piece, row, col):
-        self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
+        self.board[piece.row][piece.col], self.board[row][col] = 0, self.board[piece.row][piece.col]
         piece.move(row, col)
         if self.__this_moves_opp_player_into_check(piece, row, col):
           if piece.get_color() == BLACK:
@@ -122,7 +122,22 @@ class Board:
           if self.potential_check_board[valid_move[0]][valid_move[1]].get_color() != color:
               return True
       return False
-    
+
+    def __is_opponent_in_check_mate(self, color):
+        valid_moves = []
+        for row in range(ROWS):
+          for col in range(COLS):
+            if self.potential_check_board[row][col] != 0 and self.potential_check_board[row][col].get_color() == color:
+              valid_moves.append(self.get_valid_moves(self.potential_check_board[row][col]))
+        
+        new_list = [item for item in valid_moves if item]
+        if new_list == []:
+          print(("Check mate!!"))
+          # end game
+          return True
+        else:
+          return False
+
     def __get_all_valid_moves_for_one_colour(self, color):
         valid_moves = []
         for row in range(ROWS):
@@ -167,8 +182,10 @@ class Board:
         self.potential_check_board = copy.deepcopy(self.board)
         self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = 0, self.potential_check_board[piece.row][piece.col]
         if (piece.get_color() == BLACK):
+          self.__is_opponent_in_check_mate(WHITE)
           return self.__is_opponent_in_check(BLACK)
         else:
+          self.__is_opponent_in_check_mate(BLACK)
           return self.__is_opponent_in_check(WHITE)
     
     def __get_valid_pawn_moves(self, board, row, col, piece):
