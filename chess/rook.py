@@ -4,6 +4,15 @@ from chess.piece import Piece
 from .constants import BLACK, WHITE
 
 class Rook(Piece):
+
+    this_is_first_move = True
+
+    def set_this_is_first_move_to_false(self):
+        self.this_is_first_move = False
+    
+    def this_is_first_move(self):
+        return self.this_is_first_move
+    
     def create(self, win, row, col):
         if self.get_color() == BLACK:
           win.blit(pygame.image.load('chess/assets/black_rook.png'), (col*100, row*100))

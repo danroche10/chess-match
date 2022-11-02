@@ -1,5 +1,4 @@
-import pygame
-from .constants import SQUARE_SIZE, GREY
+from .constants import SQUARE_SIZE
 
 class Piece:
     PADDING = 15

@@ -11,8 +11,20 @@ class Board:
         self.__create_board()
     
     def move(self, piece, row, col):
-        self.board[piece.row][piece.col], self.board[row][col] = 0, self.get_piece(piece.row, piece.col)
-        piece.move(row, col)
+        if piece.get_type() == "KING" and (col - piece.col == 2):
+          self.castle_to_right(piece, row, col)
+        elif piece.get_type() == "KING" and (piece.col - col == 3):
+          self.castle_to_left(piece, row, col)
+        else:
+          self.board[piece.row][piece.col], self.board[row][col] = 0, self.get_piece(piece.row, piece.col)
+          piece.move(row, col)
+        if piece.get_type() == "KING" or piece.get_type() == "ROOK":
+          piece.set_this_is_first_move_to_false()
+        if piece.get_type() == "PAWN":
+          if row == 0:
+            self.board[row][col] = self.piece_factory.new_queen(row, col, BLACK)
+          elif row == 7: 
+            self.board[row][col] = self.piece_factory.new_queen(row, col, WHITE)
         if self.__this_moves_opp_player_into_check(piece, row, col):
           if piece.get_color() == BLACK:
             print("White is in check") 
@@ -26,6 +38,14 @@ class Board:
 
     def remove(self, pieces):
         self.board[pieces[0].row][pieces[0].col] = 0
+    
+    def draw(self, win):
+      self.__draw_squares(win)
+      for row in range(ROWS):
+          for col in range(COLS):
+              piece = self.get_piece(row, col)                          
+              if piece != 0:
+                  piece.create(win, row, col)
     
     # Below methods reach into piece extension methods
     def get_valid_moves(self, piece_to_play):
@@ -98,6 +118,18 @@ class Board:
         self.__is_opponent_in_check_mate(BLACK)
         return self.__is_opponent_in_check(WHITE)
 
+    def castle_to_right(self, piece, row, col):
+        self.board[row][col+1].move(row, col-1)
+        self.board[piece.row][piece.col], self.board[row][col] = 0, self.get_piece(piece.row, piece.col)
+        piece.move(row, col)
+        self.board[row][col+1], self.board[row][col-1] = 0, self.get_piece(row, col+1)
+    
+    def castle_to_left(self, piece, row, col):
+        self.board[row][col-1].move(row, col+1)
+        self.board[piece.row][piece.col], self.board[row][col] = 0, self.get_piece(piece.row, piece.col)
+        piece.move(row, col)
+        self.board[row][col-1], self.board[row][col+1] = 0, self.get_piece(row, col-1)
+
     # methods for drawing board
     def __create_board(self):
       for row in range(ROWS):
@@ -135,14 +167,6 @@ class Board:
                       self.board[row].append(0)
               else:
                   self.board[row].append(0)
-
-    def draw(self, win):
-      self.__draw_squares(win)
-      for row in range(ROWS):
-          for col in range(COLS):
-              piece = self.get_piece(row, col)                          
-              if piece != 0:
-                  piece.create(win, row, col)
 
     def __draw_squares(self, win):
       win.fill(LIGHT_GREY)

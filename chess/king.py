@@ -6,6 +6,12 @@ from chess.piece import Piece
 from .constants import BLACK, WHITE
 
 class King(Piece):
+
+    this_is_first_move = True
+
+    def set_this_is_first_move_to_false(self):
+        self.this_is_first_move = False
+        
     def create(self, win, row, col):
         if self.get_color() == BLACK:
           win.blit(pygame.image.load('chess/assets/black_king.png'), (col*100, row*100))
@@ -14,6 +20,10 @@ class King(Piece):
 
     def get_valid_king_moves(self, board, row, col, color):
         moves = {}
+        if self.this_is_first_move == True and board[row][col+1] == 0 and board[row][col+2] == 0:
+            moves = Helpers.update_valid_moves(moves, row, col+2)
+        if  self.this_is_first_move == True and board[row][col-1] == 0 and board[row][col-2] == 0 and board[row][col-3] == 0 and board[row][col-3].this_is_first_move():
+            moves = Helpers.update_valid_moves(moves, row, col-3)   
         if col <= 6:
             if board[row][col+1] == 0:
                 moves = Helpers.update_valid_moves(moves, row, col+1)
