@@ -10,7 +10,7 @@ class Rook(Piece):
     def set_this_is_first_move_to_false(self):
         self.this_is_first_move = False
     
-    def this_is_first_move(self):
+    def get_is_first_move(self):
         return self.this_is_first_move
     
     def create(self, win, row, col):

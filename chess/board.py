@@ -1,34 +1,31 @@
+from this import d
 import pygame
 import copy
-from .constants import BLACK, LIGHT_GREY, ROWS, RED, SQUARE_SIZE, COLS, WHITE
+from .constants import BLACK, LIGHT_GREY, ROWS, RED, SQUARE_SIZE, COLS, WHITE, PIECE_TYPES
 
 class Board:
     def __init__(self, piece_factory):
-        self.board = []
-        self.potential_check_board = []
+        self.board, self.potential_check_board = [], []
         self.piece_factory = piece_factory
-        self.pieces = ["PAWN", "ROOK", "KNIGHT", "BISHOP", "QUEEN", "KING"]
+        self.piece_types = PIECE_TYPES
         self.__create_board()
     
-    def move(self, piece, row, col):
-        if piece.get_type() == "KING" and (col - piece.col == 2):
-          self.castle_to_right(piece, row, col)
-        elif piece.get_type() == "KING" and (piece.col - col == 3):
-          self.castle_to_left(piece, row, col)
+    def move(self, piece_to_move, destination_row, destination_col):
+        if piece_to_move.get_type() == "KING" and (destination_col - piece_to_move.col == 2):
+          self.__castle_to_right(piece_to_move, destination_row, destination_col)
+        elif piece_to_move.get_type() == "KING" and (piece_to_move.col - destination_col == 3):
+          self.__castle_to_left(piece_to_move, destination_row, destination_col)
         else:
-          self.board[piece.row][piece.col], self.board[row][col] = 0, self.get_piece(piece.row, piece.col)
-          piece.move(row, col)
-        if piece.get_type() == "KING" or piece.get_type() == "ROOK":
-          piece.set_this_is_first_move_to_false()
-        if piece.get_type() == "PAWN":
-          if row == 0:
-            self.board[row][col] = self.piece_factory.new_queen(row, col, BLACK)
-          elif row == 7: 
-            self.board[row][col] = self.piece_factory.new_queen(row, col, WHITE)
-        if self.__this_moves_opp_player_into_check(piece, row, col):
-          if piece.get_color() == BLACK:
-            print("White is in check") 
-          else: print("Black is in check")
+          self.__standard_move(piece_to_move, destination_row, destination_col)
+        if piece_to_move.get_type() == "KING" or piece_to_move.get_type() == "ROOK":
+          piece_to_move.set_this_is_first_move_to_false()
+        if piece_to_move.get_type() == "PAWN":
+          if destination_row == 0:
+            self.board[destination_row][destination_col] = self.piece_factory.new_queen(destination_row, destination_col, BLACK)
+          elif destination_row == 7: 
+            self.board[destination_row][destination_col] = self.piece_factory.new_queen(destination_row, destination_col, WHITE)
+        if self.__this_moves_opp_player_into_check(piece_to_move, destination_row, destination_col):
+            self.__notify_players_of_check(piece_to_move)
     
     def get_piece(self, row, col): 
         return self.board[row][col]
@@ -36,8 +33,8 @@ class Board:
     def get_piece_from_potential_check_board(self, row, col): 
         return self.potential_check_board[row][col]
 
-    def remove(self, pieces):
-        self.board[pieces[0].row][pieces[0].col] = 0
+    def remove(self, piece):
+        self.board[piece[0].row][piece[0].col] = 0
     
     def draw(self, win):
       self.__draw_squares(win)
@@ -49,37 +46,51 @@ class Board:
     
     # Below methods reach into piece extension methods
     def get_valid_moves(self, piece_to_play):
-        moves = {}
-        row = piece_to_play.row
-        col = piece_to_play.col
+        valid_moves = {}
+        destination_row, destination_col = piece_to_play.row, piece_to_play.col
         board = self.board
         
-        for piece in self.pieces:
+        for piece in self.piece_types:
           if piece_to_play.get_type() == piece:
             piece_method = f'get_valid_{piece.lower()}_moves'
-            potential_moves = getattr(piece_to_play, piece_method)(board, row, col, piece_to_play.get_color())
-            for key in potential_moves:
-              if self.__this_moves_player_into_check(piece_to_play, key[0], key[1]) == False:
-                moves[key] = potential_moves[key]
-        return moves
+            potential_moves = getattr(piece_to_play, piece_method)(board, destination_row, destination_col, piece_to_play.get_color())
+            self.__validate_moves_that_do_not_put_player_in_check(piece_to_play, potential_moves, valid_moves)
+        return valid_moves
     
-    def __is_opponent_in_check(self, color):
-        valid_moves_for_one_color = self.__get_all_valid_moves_for_one_colour(color)
+    def __validate_moves_that_do_not_put_player_in_check(self, piece_to_play, potential_moves, valid_moves):
+        for potential_move in potential_moves:
+          potential_move_destination_row = potential_move[0]
+          potential_move_destination_col = potential_move[1]
+          if self.__this_moves_player_into_check(piece_to_play, potential_move_destination_row, potential_move_destination_col) == False:
+            valid_moves[potential_move] = potential_moves[potential_move]
+    
+    def __notify_players_of_check(self, piece_to_move):
+        if piece_to_move.get_color() == BLACK:
+          print("White is in check") 
+        else: print("Black is in check")
+  
+    def __standard_move(self, piece_to_move, destination_row, destination_col):
+      self.board[piece_to_move.row][piece_to_move.col], self.board[destination_row][destination_col] = 0, self.get_piece(piece_to_move.row, piece_to_move.col)
+      piece_to_move.move(destination_row, destination_col)
+    
+    def __is_opponent_in_check(self, color_to_play):
+        valid_moves_for_one_color = self.__get_all_valid_moves_for_one_colour(color_to_play)
         for valid_move in valid_moves_for_one_color:
-          if self.get_piece_from_potential_check_board(valid_move[0], valid_move[1]) != 0 and (self.get_piece_from_potential_check_board(valid_move[0], valid_move[1]).get_type() == "KING"):
-            if self.get_piece_from_potential_check_board(valid_move[0], valid_move[1]).get_color() != color:
+          valid_move_desination_row, valid_move_destination_col = valid_move[0], valid_move[1]
+          if self.get_piece_from_potential_check_board(valid_move_desination_row, valid_move_destination_col) != 0 and (self.get_piece_from_potential_check_board(valid_move_desination_row, valid_move_destination_col).get_type() == "KING"):
+            if self.get_piece_from_potential_check_board(valid_move_desination_row, valid_move_destination_col).get_color() != color_to_play:
                 return True
         return False
 
-    def __is_opponent_in_check_mate(self, color):
+    def __is_opponent_in_check_mate(self, color_to_play):
         valid_moves = []
-        for row in range(ROWS):
-          for col in range(COLS):
-            if self.get_piece_from_potential_check_board(row, col) != 0 and self.get_piece_from_potential_check_board(row, col).get_color() == color:
-              valid_moves.append(self.get_valid_moves(self.get_piece_from_potential_check_board(row, col)))
+        for valid_move_destination_row in range(ROWS):
+          for valid_move_destination_col in range(COLS):
+            if self.get_piece_from_potential_check_board(valid_move_destination_row, valid_move_destination_col) != 0 and self.get_piece_from_potential_check_board(valid_move_destination_row, valid_move_destination_col).get_color() == color_to_play:
+              valid_moves.append(self.get_valid_moves(self.get_piece_from_potential_check_board(valid_move_destination_row, valid_move_destination_col)))
         
-        new_list = [item for item in valid_moves if item]
-        if new_list == []:
+        valid_moves_with_empty_dicts_removed = [valid_move for valid_move in valid_moves if valid_move]
+        if valid_moves_with_empty_dicts_removed == []:
           print(("Check mate!!"))
           # end game
           return True
@@ -88,47 +99,54 @@ class Board:
     
     def __get_all_valid_moves_for_one_colour(self, color):
         valid_moves = []
-        for row in range(ROWS):
-          for col in range(COLS):
-            if self.get_piece_from_potential_check_board(row, col) != 0 and self.get_piece_from_potential_check_board(row, col).get_color() == color:
-              for piece in self.pieces:
-                if self.get_piece_from_potential_check_board(row, col).get_type() == piece:
-                  piece_method = f'get_valid_{piece.lower()}_moves'
-                  valid_piece_moves = list(getattr(self.get_piece_from_potential_check_board(row, col), piece_method)(self.potential_check_board, row, col, color))
-                  for move in valid_piece_moves:
-                      valid_moves.append(move)
+        for valid_move_destination_row in range(ROWS):
+          for valid_move_destination_col in range(COLS):
+            if self.get_piece_from_potential_check_board(valid_move_destination_row, valid_move_destination_col) != 0 and self.get_piece_from_potential_check_board(valid_move_destination_row, valid_move_destination_col).get_color() == color:
+                self.__get_valid_moves_for_each_piece_type(valid_moves, valid_move_destination_row, valid_move_destination_col, color)
         
         return valid_moves
 
-    def __this_moves_player_into_check(self, piece, row, col):
+    def __get_valid_moves_for_each_piece_type(self, valid_moves, valid_move_destination_row, valid_move_destination_col, color):
+        for piece_type in self.piece_types:
+          if self.get_piece_from_potential_check_board(valid_move_destination_row, valid_move_destination_col).get_type() == piece_type:
+              get_valid_x_moves_method = f'get_valid_{piece_type.lower()}_moves'
+              valid_piece_moves = list(getattr(self.get_piece_from_potential_check_board(valid_move_destination_row, valid_move_destination_col), get_valid_x_moves_method)(self.potential_check_board, valid_move_destination_row, valid_move_destination_col, color))
+              for move in valid_piece_moves:
+                  valid_moves.append(move)
+        
+        return valid_moves
+
+    def __this_moves_player_into_check(self, piece_to_move, destination_row, destination_col):
       self.potential_check_board = copy.deepcopy(self.board)
-      self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col]  = 0, self.get_piece_from_potential_check_board(piece.row, piece.col)
-      if (piece.get_color() == BLACK):
+      self.potential_check_board[piece_to_move.row][piece_to_move.col], self.potential_check_board[destination_row][destination_col]  = 0, self.get_piece_from_potential_check_board(piece_to_move.row, piece_to_move.col)
+      if (piece_to_move.get_color() == BLACK):
         return self.__is_opponent_in_check(WHITE)
       else:
         return self.__is_opponent_in_check(BLACK)
 
-    def __this_moves_opp_player_into_check(self, piece, row, col):
+    def __this_moves_opp_player_into_check(self, piece_to_move, destination_row, destination_col):
       self.potential_check_board = copy.deepcopy(self.board)
-      self.potential_check_board[piece.row][piece.col], self.potential_check_board[row][col] = 0, self.get_piece_from_potential_check_board(piece.row, piece.col)
-      if (piece.get_color() == BLACK):
+      self.potential_check_board[piece_to_move.row][piece_to_move.col], self.potential_check_board[destination_row][destination_col] = 0, self.get_piece_from_potential_check_board(piece_to_move.row, piece_to_move.col)
+      if (piece_to_move.get_color() == BLACK):
         self.__is_opponent_in_check_mate(WHITE)
         return self.__is_opponent_in_check(BLACK)
       else:
         self.__is_opponent_in_check_mate(BLACK)
         return self.__is_opponent_in_check(WHITE)
 
-    def castle_to_right(self, piece, row, col):
-        self.board[row][col+1].move(row, col-1)
-        self.board[piece.row][piece.col], self.board[row][col] = 0, self.get_piece(piece.row, piece.col)
-        piece.move(row, col)
-        self.board[row][col+1], self.board[row][col-1] = 0, self.get_piece(row, col+1)
+    def __castle_to_right(self, king_to_move, destination_row, destination_col):
+        rook_to_move = self.get_piece(destination_row, destination_col+1)
+        rook_to_move.move(destination_row, destination_col-1)
+        self.board[king_to_move.row][king_to_move.col], self.board[destination_row][destination_col] = 0, king_to_move
+        king_to_move.move(destination_row, destination_col)
+        self.board[destination_row][destination_col+1], self.board[destination_row][destination_col-1] = 0, rook_to_move
     
-    def castle_to_left(self, piece, row, col):
-        self.board[row][col-1].move(row, col+1)
-        self.board[piece.row][piece.col], self.board[row][col] = 0, self.get_piece(piece.row, piece.col)
-        piece.move(row, col)
-        self.board[row][col-1], self.board[row][col+1] = 0, self.get_piece(row, col-1)
+    def __castle_to_left(self, king_to_move, destination_row, destination_col):
+        rook_to_move = self.board[destination_row][destination_col-1]
+        rook_to_move.move(destination_row, destination_col+1)
+        self.board[king_to_move.row][king_to_move.col], self.board[destination_row][destination_col] = 0, king_to_move
+        king_to_move.move(destination_row, destination_col)
+        self.board[destination_row][destination_col-1], self.board[destination_row][destination_col+1] = 0, rook_to_move
 
     # methods for drawing board
     def __create_board(self):
@@ -167,7 +185,7 @@ class Board:
                       self.board[row].append(0)
               else:
                   self.board[row].append(0)
-
+    
     def __draw_squares(self, win):
       win.fill(LIGHT_GREY)
       for row in range(ROWS):

@@ -11,6 +11,9 @@ class King(Piece):
 
     def set_this_is_first_move_to_false(self):
         self.this_is_first_move = False
+    
+    def get_is_first_move(self):
+        return self.this_is_first_move
         
     def create(self, win, row, col):
         if self.get_color() == BLACK:
@@ -20,9 +23,9 @@ class King(Piece):
 
     def get_valid_king_moves(self, board, row, col, color):
         moves = {}
-        if self.this_is_first_move == True and board[row][col+1] == 0 and board[row][col+2] == 0:
+        if self.get_is_first_move() == True and board[row][col+1] == 0 and board[row][col+2] == 0 and board[row][col+2] != 0 and board[row][col+2].get_is_first_move():
             moves = Helpers.update_valid_moves(moves, row, col+2)
-        if  self.this_is_first_move == True and board[row][col-1] == 0 and board[row][col-2] == 0 and board[row][col-3] == 0 and board[row][col-3].this_is_first_move():
+        if self.get_is_first_move() == True and board[row][col-1] == 0 and board[row][col-2] == 0 and board[row][col-3] == 0 and board[row][col-4] !=0 and board[row][col-4].get_is_first_move():
             moves = Helpers.update_valid_moves(moves, row, col-3)   
         if col <= 6:
             if board[row][col+1] == 0:

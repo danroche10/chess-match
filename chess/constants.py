@@ -3,6 +3,7 @@ import pygame
 WIDTH, HEIGHT = 800, 800
 ROWS, COLS = 8, 8
 SQUARE_SIZE = WIDTH//COLS
+PIECE_TYPES = ["PAWN", "ROOK", "KNIGHT", "BISHOP", "QUEEN", "KING"]
 
 # rgb
 RED = (255, 0, 0)
