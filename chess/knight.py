@@ -10,55 +10,55 @@ class Knight(Piece):
         else:
           win.blit(pygame.image.load('chess/assets/white_knight.png'), (col*100, row*100))
 
-    def get_valid_knight_moves(self, board, row, col, color):
+    def get_valid_knight_moves(self, board, current_row, current_col, color):
         moves = {}
-        if col <= 6 and row >= 2:
-            if board[row-2][col+1] == 0:
-                moves = Helpers.update_valid_moves(moves, row-2, col+1)
-            elif (board[row-2][col+1].get_color() == WHITE and color == BLACK) or (board[row-2][col+1].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row-2, col+1)
-                moves[(row-2, col+1)] = [board[row-2][col+1]]
-        if col <=6 and row <= 5:
-            if board[row+2][col+1] == 0:
-                moves = Helpers.update_valid_moves(moves, row+2, col+1)
-            elif (board[row+2][col+1].get_color() == WHITE and color == BLACK) or (board[row+2][col+1].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row, col)
-                moves[(row+2, col+1)] = [board[row+2][col+1]]
-        if col >= 1 and row >= 2:
-            if board[row-2][col-1] == 0:
-                moves = Helpers.update_valid_moves(moves, row-2, col-1)
-            elif (board[row-2][col-1].get_color() == WHITE and color == BLACK) or (board[row-2][col-1].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row-2, col-1)
-                moves[(row-2, col-1)] = [board[row-2][col-1]]
-        if col >= 1 and row <= 5:
-            if board[row+2][col-1] == 0:
-                moves = Helpers.update_valid_moves(moves, row+2, col-1)
-            elif (board[row+2][col-1].get_color() == WHITE and color == BLACK) or (board[row+2][col-1].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row+2, col-1)
-                moves[(row+2, col-1)] = [board[row+2][col-1]]
-        if col >= 2 and row <= 6:
-            if board[row+1][col-2] == 0:
-                moves = Helpers.update_valid_moves(moves, row+1, col-2)
-            elif (board[row+1][col-2].get_color() == WHITE and color == BLACK) or (board[row+1][col-2].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row+1, col-2)
-                moves[(row+1, col-2)] = [board[row+1][col-2]]
-        if col <=5 and row <= 6:
-            if board[row+1][col+2] == 0:
-                moves = Helpers.update_valid_moves(moves, row+1, col+2)
-            elif (board[row+1][col+2].get_color() == WHITE and color == BLACK) or (board[row+1][col+2].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row+1, col+2)
-                moves[(row+1, col+2)] = [board[row+1][col+2]]
-        if col >= 2 and row >= 1:
-            if board[row-1][col-2] == 0:
-                moves = Helpers.update_valid_moves(moves, row-1, col-2)
-            elif (board[row-1][col-2].get_color() == WHITE and color == BLACK) or (board[row-1][col-2].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row-1, col-2)
-                moves[(row-1, col-2)] = [board[row-1][col-2]]
-        if col <= 5 and row >= 1:
-            if board[row-1][col+2] == 0:
-                moves = Helpers.update_valid_moves(moves, row-1, col+2)
-            elif (board[row-1][col+2].get_color() == WHITE and color == BLACK) or (board[row-1][col+2].get_color() == BLACK and color == WHITE):
-                moves = Helpers.update_valid_moves(moves, row-1, col+2)
-                moves[(row-1, col+2)] = [board[row-1][col+2]]
+        if current_col <= 6 and current_row >= 2:
+            if board[current_row-2][current_col+1] == 0:
+                moves = Helpers.update_valid_moves(moves, current_row-2, current_col+1)
+            elif (board[current_row-2][current_col+1].get_color() == WHITE and color == BLACK) or (board[current_row-2][current_col+1].get_color() == BLACK and color == WHITE):
+                moves = Helpers.update_valid_moves(moves, current_row-2, current_col+1)
+                moves[(current_row-2, current_col+1)] = [board[current_row-2][current_col+1]]
+        if current_col <=6 and current_row <= 5:
+            if board[current_row+2][current_col+1] == 0:
+                moves = Helpers.update_valid_moves(moves, current_row+2, current_col+1)
+            elif (board[current_row+2][current_col+1].get_color() == WHITE and color == BLACK) or (board[current_row+2][current_col+1].get_color() == BLACK and color == WHITE):
+                moves = Helpers.update_valid_moves(moves, current_row, current_col)
+                moves[(current_row+2, current_col+1)] = [board[current_row+2][current_col+1]]
+        if current_col >= 1 and current_row >= 2:
+            if board[current_row-2][current_col-1] == 0:
+                moves = Helpers.update_valid_moves(moves, current_row-2, current_col-1)
+            elif (board[current_row-2][current_col-1].get_color() == WHITE and color == BLACK) or (board[current_row-2][current_col-1].get_color() == BLACK and color == WHITE):
+                moves = Helpers.update_valid_moves(moves, current_row-2, current_col-1)
+                moves[(current_row-2, current_col-1)] = [board[current_row-2][current_col-1]]
+        if current_col >= 1 and current_row <= 5:
+            if board[current_row+2][current_col-1] == 0:
+                moves = Helpers.update_valid_moves(moves, current_row+2, current_col-1)
+            elif (board[current_row+2][current_col-1].get_color() == WHITE and color == BLACK) or (board[current_row+2][current_col-1].get_color() == BLACK and color == WHITE):
+                moves = Helpers.update_valid_moves(moves, current_row+2, current_col-1)
+                moves[(current_row+2, current_col-1)] = [board[current_row+2][current_col-1]]
+        if current_col >= 2 and current_row <= 6:
+            if board[current_row+1][current_col-2] == 0:
+                moves = Helpers.update_valid_moves(moves, current_row+1, current_col-2)
+            elif (board[current_row+1][current_col-2].get_color() == WHITE and color == BLACK) or (board[current_row+1][current_col-2].get_color() == BLACK and color == WHITE):
+                moves = Helpers.update_valid_moves(moves, current_row+1, current_col-2)
+                moves[(current_row+1, current_col-2)] = [board[current_row+1][current_col-2]]
+        if current_col <=5 and current_row <= 6:
+            if board[current_row+1][current_col+2] == 0:
+                moves = Helpers.update_valid_moves(moves, current_row+1, current_col+2)
+            elif (board[current_row+1][current_col+2].get_color() == WHITE and color == BLACK) or (board[current_row+1][current_col+2].get_color() == BLACK and color == WHITE):
+                moves = Helpers.update_valid_moves(moves, current_row+1, current_col+2)
+                moves[(current_row+1, current_col+2)] = [board[current_row+1][current_col+2]]
+        if current_col >= 2 and current_row >= 1:
+            if board[current_row-1][current_col-2] == 0:
+                moves = Helpers.update_valid_moves(moves, current_row-1, current_col-2)
+            elif (board[current_row-1][current_col-2].get_color() == WHITE and color == BLACK) or (board[current_row-1][current_col-2].get_color() == BLACK and color == WHITE):
+                moves = Helpers.update_valid_moves(moves, current_row-1, current_col-2)
+                moves[(current_row-1, current_col-2)] = [board[current_row-1][current_col-2]]
+        if current_col <= 5 and current_row >= 1:
+            if board[current_row-1][current_col+2] == 0:
+                moves = Helpers.update_valid_moves(moves, current_row-1, current_col+2)
+            elif (board[current_row-1][current_col+2].get_color() == WHITE and color == BLACK) or (board[current_row-1][current_col+2].get_color() == BLACK and color == WHITE):
+                moves = Helpers.update_valid_moves(moves, current_row-1, current_col+2)
+                moves[(current_row-1, current_col+2)] = [board[current_row-1][current_col+2]]
         
         return moves
