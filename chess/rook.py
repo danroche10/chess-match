@@ -35,8 +35,7 @@ class Rook(Piece):
     def _get_vertical_rook_moves(self, moves, board, potential_move_current_row, current_row, current_col, color):
         self._get_vertical_moves_down(moves, board, current_row, current_col, potential_move_current_row, color)
         self._get_vertical_moves_up(moves, board, current_row, current_col, potential_move_current_row, color)
-
-
+    
     def _get_horizontal_moves_to_right(self, moves, board, current_row, current_col, potential_move_current_col, color):
         while potential_move_current_col <= 7:
             potential_move_current_col += 1
