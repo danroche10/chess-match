@@ -1,4 +1,3 @@
-from this import d
 import pygame
 import copy
 from .constants import BLACK, LIGHT_GREY, ROWS, RED, SQUARE_SIZE, COLS, WHITE, PIECE_TYPES
@@ -11,21 +10,13 @@ class Board:
         self.__create_board()
     
     def move(self, piece_to_move, destination_row, destination_col):
-        if piece_to_move.get_type() == "KING" and (destination_col - piece_to_move.col == 2):
+        if self.__player_is_castling_to_right(piece_to_move, destination_col):
           self.__castle_to_right(piece_to_move, destination_row, destination_col)
-        elif piece_to_move.get_type() == "KING" and (piece_to_move.col - destination_col == 3):
+        elif self.__player_is_castling_to_left(piece_to_move, destination_col):
           self.__castle_to_left(piece_to_move, destination_row, destination_col)
         else:
           self.__standard_move(piece_to_move, destination_row, destination_col)
-        if piece_to_move.get_type() == "KING" or piece_to_move.get_type() == "ROOK":
-          piece_to_move.set_this_is_first_move_to_false()
-        if piece_to_move.get_type() == "PAWN":
-          if destination_row == 0:
-            self.board[destination_row][destination_col] = self.piece_factory.new_queen(destination_row, destination_col, BLACK)
-          elif destination_row == 7: 
-            self.board[destination_row][destination_col] = self.piece_factory.new_queen(destination_row, destination_col, WHITE)
-        if self.__this_moves_opp_player_into_check(piece_to_move, destination_row, destination_col):
-            self.__notify_players_of_check(piece_to_move)
+        self.__make_any_relevant_updates_following_move(piece_to_move, destination_row, destination_col)
     
     def get_piece(self, row, col): 
         return self.board[row][col]
@@ -48,20 +39,25 @@ class Board:
     def get_valid_moves(self, piece_to_play):
         valid_moves = {}
         destination_row, destination_col = piece_to_play.row, piece_to_play.col
-        board = self.board
         
         for piece in self.piece_types:
           if piece_to_play.get_type() == piece:
             piece_method = f'get_valid_{piece.lower()}_moves'
-            potential_moves = getattr(piece_to_play, piece_method)(board, destination_row, destination_col, piece_to_play.get_color())
+            potential_moves = getattr(piece_to_play, piece_method)(self.board, destination_row, destination_col, piece_to_play.get_color())
             self.__validate_moves_that_do_not_put_player_in_check(piece_to_play, potential_moves, valid_moves)
         return valid_moves
     
-    def __validate_moves_that_do_not_put_player_in_check(self, piece_to_play, potential_moves, valid_moves):
+    def __validate_moves_that_do_not_put_player_in_check(self, piece_to_move, potential_moves, valid_moves):
         for potential_move in potential_moves:
           potential_move_destination_row = potential_move[0]
           potential_move_destination_col = potential_move[1]
-          if self.__this_moves_player_into_check(piece_to_play, potential_move_destination_row, potential_move_destination_col) == False:
+          if piece_to_move.get_type() == "KING" and (potential_move_destination_col - piece_to_move.col == 2):
+            if self.__this_moves_player_into_check(piece_to_move, potential_move_destination_row, potential_move_destination_col-1) == False and self.__this_moves_player_into_check(piece_to_move, potential_move_destination_row, potential_move_destination_col) == False:
+              valid_moves[potential_move] = potential_moves[potential_move]
+          elif piece_to_move.get_type() == "KING" and (piece_to_move.col - potential_move_destination_col == 3):
+            if self.__this_moves_player_into_check(piece_to_move, potential_move_destination_row, potential_move_destination_col+1) == False and self.__this_moves_player_into_check(piece_to_move, potential_move_destination_row, potential_move_destination_col+2) == False and self.__this_moves_player_into_check(piece_to_move, potential_move_destination_row, potential_move_destination_col) == False:
+              valid_moves[potential_move] = potential_moves[potential_move]
+          elif piece_to_move.get_type() and self.__this_moves_player_into_check(piece_to_move, potential_move_destination_row, potential_move_destination_col) == False:
             valid_moves[potential_move] = potential_moves[potential_move]
     
     def __notify_players_of_check(self, piece_to_move):
@@ -134,6 +130,20 @@ class Board:
         self.__is_opponent_in_check_mate(BLACK)
         return self.__is_opponent_in_check(WHITE)
 
+    def __make_any_relevant_updates_following_move(self, piece_to_move, destination_row, destination_col):
+      if piece_to_move.get_type() == "KING" or piece_to_move.get_type() == "ROOK":
+        piece_to_move.set_this_is_first_move_to_false()
+      if piece_to_move.get_type() == "PAWN" and (destination_row == 0 or destination_row == 7):
+        self.__promote_pawn(self, destination_row, destination_col)
+      if self.__this_moves_opp_player_into_check(piece_to_move, destination_row, destination_col):
+        self.__notify_players_of_check(piece_to_move)
+    
+    def __player_is_castling_to_right(self, piece_to_move, destination_col):
+       return piece_to_move.get_type() == "KING" and (destination_col - piece_to_move.col == 2)
+
+    def __player_is_castling_to_left(self, piece_to_move, destination_col):
+       return piece_to_move.get_type() == "KING" and (piece_to_move.col - destination_col == 3)
+
     def __castle_to_right(self, king_to_move, destination_row, destination_col):
         rook_to_move = self.get_piece(destination_row, destination_col+1)
         rook_to_move.move(destination_row, destination_col-1)
@@ -147,6 +157,12 @@ class Board:
         self.board[king_to_move.row][king_to_move.col], self.board[destination_row][destination_col] = 0, king_to_move
         king_to_move.move(destination_row, destination_col)
         self.board[destination_row][destination_col-1], self.board[destination_row][destination_col+1] = 0, rook_to_move
+    
+    def __promote_pawn(self, destination_row, destination_col):
+        if destination_row == 0:
+            self.board[destination_row][destination_col] = self.piece_factory.new_queen(destination_row, destination_col, BLACK)
+        elif destination_row == 7: 
+            self.board[destination_row][destination_col] = self.piece_factory.new_queen(destination_row, destination_col, WHITE)
 
     # methods for drawing board
     def __create_board(self):

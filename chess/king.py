@@ -23,7 +23,7 @@ class King(Piece):
 
     def get_valid_king_moves(self, board, current_row, current_col, color):
         moves = {}
-        if self.get_is_first_move() == True and board[current_row][current_col+1] == 0 and board[current_row][current_col+2] == 0 and board[current_row][current_col+2] != 0 and board[current_row][current_col+2].get_is_first_move():
+        if self.get_is_first_move() == True and board[current_row][current_col+1] == 0 and board[current_row][current_col+2] == 0 and board[current_row][current_col+3] != 0 and board[current_row][current_col+3].get_is_first_move():
             moves = Helpers.update_valid_moves(moves, current_row, current_col+2)
         if self.get_is_first_move() == True and board[current_row][current_col-1] == 0 and board[current_row][current_col-2] == 0 and board[current_row][current_col-3] == 0 and board[current_row][current_col-4] !=0 and board[current_row][current_col-4].get_is_first_move():
             moves = Helpers.update_valid_moves(moves, current_row, current_col-3)   
