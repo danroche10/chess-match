@@ -12,25 +12,17 @@ class Pawn(Piece):
 
     def get_valid_pawn_moves(self, board, current_row, current_col, color):
       moves = {}
-      if color == BLACK:
-        if Pawn._one_square_ahead_is_empty(color, board, current_row, current_col):
-            moves = Helpers.update_valid_moves(moves, current_row-1, current_col)
-        if Pawn._first_move_and_two_squares_ahead_is_empty(color, board, current_row, current_col) and Pawn._one_square_ahead_is_empty(color, board, current_row, current_col): 
-            moves = Helpers.update_valid_moves(moves, current_row-2, current_col)
-        if Pawn._right_diagonal_take_is_valid(current_col) and Pawn._immediate_right_diagonal_contains_opponent_piece(color, board, current_row, current_col):
-            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_right_diagonal_take(color, board, moves, current_row, current_col)
-        if Pawn._left_diagonal_take_is_valid(current_col) and Pawn._immediate_left_diagonal_contains_opponent_piece(color, board, current_row, current_col):
-            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_left_diagonal_take(color, board, moves, current_row, current_col)
-      if color == WHITE:
-        if Pawn._one_square_ahead_is_empty(color, board, current_row, current_col):
-            moves = Helpers.update_valid_moves(moves, current_row+1, current_col)
-        if Pawn._first_move_and_two_squares_ahead_is_empty(color, board, current_row, current_col) and Pawn._one_square_ahead_is_empty(color, board, current_row, current_col): 
-            moves = Helpers.update_valid_moves(moves, current_row+2, current_col)
-        if Pawn._right_diagonal_take_is_valid(current_col) and Pawn._immediate_right_diagonal_contains_opponent_piece(color, board, current_row, current_col):
-            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_right_diagonal_take(color, board, moves, current_row, current_col)
-        if Pawn._left_diagonal_take_is_valid(current_col) and Pawn._immediate_left_diagonal_contains_opponent_piece(color, board, current_row, current_col):
-            moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_left_diagonal_take(color, board, moves, current_row, current_col)
-          
+      row_move_multiple = -1 if color == BLACK else 1
+      
+      if Pawn._one_square_ahead_is_empty(color, board, current_row, current_col):
+          moves = Helpers.update_valid_moves(moves, current_row+(row_move_multiple*1), current_col)
+      if Pawn._first_move_and_two_squares_ahead_is_empty(color, board, current_row, current_col) and Pawn._one_square_ahead_is_empty(color, board, current_row, current_col): 
+          moves = Helpers.update_valid_moves(moves, current_row+(row_move_multiple*2), current_col)
+      if Pawn._right_diagonal_take_is_valid(current_col) and Pawn._immediate_right_diagonal_contains_opponent_piece(color, board, current_row, current_col):
+          moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_right_diagonal_take(color, board, moves, current_row, current_col)
+      if Pawn._left_diagonal_take_is_valid(current_col) and Pawn._immediate_left_diagonal_contains_opponent_piece(color, board, current_row, current_col):
+          moves = Pawn._get_updated_valid_moves_including_skipped_piece_for_left_diagonal_take(color, board, moves, current_row, current_col)
+
       return moves
 
     def _one_square_ahead_is_empty(color, board, current_row, current_col):
