@@ -86,10 +86,7 @@ class Board:
               valid_moves.append(self.get_valid_moves(self.get_piece_from_potential_check_board(valid_move_destination_row, valid_move_destination_col)))
         
         valid_moves_with_empty_dicts_removed = [valid_move for valid_move in valid_moves if valid_move]
-        if valid_moves_with_empty_dicts_removed == []:
-          return True
-        else:
-          return False
+        return True if valid_moves_with_empty_dicts_removed == [] else False
     
     def __get_all_valid_moves_for_one_colour(self, color):
         valid_moves = []
@@ -128,8 +125,8 @@ class Board:
               return
             return True
       else:
-         if self.__is_opponent_in_check(BLACK):
-            if self.__is_opponent_in_check_mate(WHITE):
+         if self.__is_opponent_in_check(WHITE):
+            if self.__is_opponent_in_check_mate(BLACK):
               print("checkmate!!")
               return
             return True

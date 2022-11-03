@@ -18,8 +18,8 @@ class Queen(Piece):
         self._get_moves_to_left_horizontal(moves, board, current_row, potential_move_col, color)
         self._get_moves_vertical_down(moves, board, current_row, current_col, potential_move_row, color)
         self._get_moves_vertical_up(moves, board, current_row, current_col, potential_move_row, color)
+        self._get_moves_left_diagonal_down(moves, board, current_row, current_col, potential_move_row, potential_move_col, color)
         self._get_moves_right_diagonal_down(moves, board, current_row, current_col, potential_move_row, potential_move_col, color)
-        self._get_moves_right_diagonal_up(moves, board, current_row, current_col, potential_move_row, potential_move_col, color)
         self._get_moves_left_diagonal_up(moves, board, current_row, current_col, potential_move_row, potential_move_col, color)
         self._get_moves_right_diagonal_up(moves, board, current_row, current_col, potential_move_row, potential_move_col, color)
             
