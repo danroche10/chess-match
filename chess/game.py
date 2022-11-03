@@ -1,11 +1,12 @@
 import pygame
 from .constants import WHITE, BLACK, BLUE, SQUARE_SIZE
 
+
 class Game:
     def __init__(self, win, board):
         self.__init(board)
         self.win = win
-    
+
     def update(self):
         self.__draw_board(self.win)
         self.__draw_valid_moves(self.valid_moves)
@@ -23,7 +24,7 @@ class Game:
             self.selected = piece
             self.valid_moves = self.__get_valid_moves(piece)
             return True
-            
+
         return False
 
     def __init(self, board):
@@ -46,7 +47,15 @@ class Game:
     def __draw_valid_moves(self, moves):
         for move in moves:
             row, col = move
-            pygame.draw.circle(self.win, BLUE, (col * SQUARE_SIZE + SQUARE_SIZE//2, row * SQUARE_SIZE + SQUARE_SIZE//2), 15)
+            pygame.draw.circle(
+                self.win,
+                BLUE,
+                (
+                    col * SQUARE_SIZE + SQUARE_SIZE // 2,
+                    row * SQUARE_SIZE + SQUARE_SIZE // 2,
+                ),
+                15,
+            )
 
     def __change_turn(self):
         self.valid_moves = {}
@@ -54,19 +63,19 @@ class Game:
             self.turn = WHITE
         else:
             self.turn = BLACK
-    
+
     # Below methods reach into board.py
     def __get_piece(self, row, col):
-      return self.board.get_piece(row, col)
+        return self.board.get_piece(row, col)
 
     def __get_valid_moves(self, piece):
-      return self.board.get_valid_moves(piece)
+        return self.board.get_valid_moves(piece)
 
     def __remove_piece_from_board(self, skipped_piece):
-      return self.board.remove(skipped_piece)
+        return self.board.remove(skipped_piece)
 
     def __move_piece_to_new_square(self, piece, row, col):
-      return self.board.move(piece, row, col)
+        return self.board.move(piece, row, col)
 
     def __draw_board(self, win):
-      self.board.draw(win)
+        self.board.draw(win)

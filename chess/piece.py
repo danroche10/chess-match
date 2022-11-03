@@ -1,9 +1,10 @@
 from .constants import SQUARE_SIZE
 
+
 class Piece:
     PADDING = 15
     OUTLINE = 2
-    
+
     def __init__(self, row, col, color, type):
         self.row = row
         self.col = col

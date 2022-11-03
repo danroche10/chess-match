@@ -84,6 +84,3 @@ class Pawn(Piece):
       else:
         moves[(current_row+1, current_col-1)] = [board[current_row+1][current_col-1]]
       return moves
-
-
-
