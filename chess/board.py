@@ -87,8 +87,6 @@ class Board:
         
         valid_moves_with_empty_dicts_removed = [valid_move for valid_move in valid_moves if valid_move]
         if valid_moves_with_empty_dicts_removed == []:
-          print(("Check mate!!"))
-          # end game
           return True
         else:
           return False
@@ -124,11 +122,17 @@ class Board:
       self.potential_check_board = copy.deepcopy(self.board)
       self.potential_check_board[piece_to_move.row][piece_to_move.col], self.potential_check_board[destination_row][destination_col] = 0, self.get_piece_from_potential_check_board(piece_to_move.row, piece_to_move.col)
       if (piece_to_move.get_color() == BLACK):
-        self.__is_opponent_in_check_mate(WHITE)
-        return self.__is_opponent_in_check(BLACK)
+         if self.__is_opponent_in_check(BLACK):
+            if self.__is_opponent_in_check_mate(WHITE):
+              print("checkmate!!")
+              return
+            return True
       else:
-        self.__is_opponent_in_check_mate(BLACK)
-        return self.__is_opponent_in_check(WHITE)
+         if self.__is_opponent_in_check(BLACK):
+            if self.__is_opponent_in_check_mate(WHITE):
+              print("checkmate!!")
+              return
+            return True
 
     def __make_any_relevant_updates_following_move(self, piece_to_move, destination_row, destination_col):
       if piece_to_move.get_type() == "KING" or piece_to_move.get_type() == "ROOK":
