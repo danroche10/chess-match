@@ -13,9 +13,6 @@ pip3 install -r requirements.txt
 python3 main.py
 ```
 
-![Screenshot 2022-11-05 at 13 44 03](https://user-images.githubusercontent.com/52405038/200122912-e567a9bf-088a-4dd0-a2dc-59c679b60f93.png)
-
-
 https://user-images.githubusercontent.com/52405038/200123022-f741d934-8d9a-45d3-9d45-ed34a2786cd9.mov
 
 
