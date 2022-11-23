@@ -13,6 +13,10 @@ pip3 install -r requirements.txt
 python3 main.py
 ```
 
-https://user-images.githubusercontent.com/52405038/200123022-f741d934-8d9a-45d3-9d45-ed34a2786cd9.mov
+
+
+https://user-images.githubusercontent.com/52405038/203621648-714a2817-81af-40e8-86a8-8e03ae6273ea.mp4
+
+
 
 
